@@ -57,7 +57,7 @@
             </div>
             <hr class="h-px w-full border-t border-[#E9C664]">
             <div class="text-white font-poppins text-sm text-center mt-5">
-                © Copyright Barber by KULMN 2024
+                © Copyright Barber by KULMN {{ date('Y') }}
             </div>
         </div>
     </div>

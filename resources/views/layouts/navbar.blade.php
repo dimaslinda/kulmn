@@ -41,7 +41,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/galeri"
+                    <a href="/academy"
                         class="block py-2 px-3 hover:bg-tombol hover:text-tombol md:hover:bg-transparent md:border-0 md:hover:text-tombol rounded-sm md:bg-transparent md:text-white capitalize">
                         academy
                     </a>

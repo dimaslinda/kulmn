@@ -15,4 +15,9 @@ class GeneralControlllers extends Controller
     {
         return view('mitra');
     }
+
+    public function academy()
+    {
+        return view('academy');
+    }
 }

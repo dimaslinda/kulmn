@@ -29,7 +29,26 @@
         <div class="container mx-auto px-6 py-10 md:py-20 xl:py-24 max-w-screen-xl">
             <div class="flex flex-col lg:flex-row">
                 <x-barber-images :image1="'img/general/bergabung-1.webp'" :alt1="'barber 1'" :image2="'img/general/bergabung-2.webp'" :alt2="'barber 2'" />
-                <x-terms-and-conditions />
+                @php
+                    $terms = [
+                        ['title' => 'Komitmen', 'description' => 'Menjalankan seluruh komitmen yang telah di sepakati'],
+                        [
+                            'title' => 'Badan Hukum',
+                            'description' => 'Memiliki legalitas badan hukum atau perseorangan yang harus di lampirkan',
+                        ],
+                        [
+                            'title' => 'Kerjasama Jangka Panjang',
+                            'description' =>
+                                'mitra yang memiliki visi tumbuh bersama dan siap untuk menjalin kemitraan dalam jangka panjang.',
+                        ],
+                        [
+                            'title' => 'Menjaga Reputasi',
+                            'description' =>
+                                'Menjaga integritas serta tidak melakukan tindakan yang dapat merugikan citra perusahaan dan Kerja sama yang sehat',
+                        ],
+                    ];
+                @endphp
+                <x-terms-and-conditions :terms="$terms" />
             </div>
         </div>
     </section>
