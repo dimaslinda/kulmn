@@ -104,6 +104,7 @@ class PaymentController extends Controller
 
 
             $transaction = Transaction::create([
+                'user_id' => $user->id,
                 'branch_id' => $branchId,
                 'invoice_number' => $invoice_number,
                 'total_amount' => $totalAmount,

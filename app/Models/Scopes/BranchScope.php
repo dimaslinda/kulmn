@@ -13,7 +13,10 @@ class BranchScope implements Scope
     {
         // Hanya terapkan scope jika user login dan bukan admin
         if (Auth::check() && Auth::user()->email !== 'admin@admin.com') {
-            $builder->where('branch_id', Auth::user()->branch_id);
+            // Only apply the scope if the model has a 'branch_id' column
+            if (in_array('branch_id', $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable()))) {
+                $builder->where('branch_id', Auth::user()->branch_id);
+            }
         }
     }
 }
