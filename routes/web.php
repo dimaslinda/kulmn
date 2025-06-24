@@ -10,7 +10,7 @@ Route::get('/', [GeneralControlllers::class, 'index'])->name('index');
 Route::get('/mitra', [GeneralControlllers::class, 'mitra'])->name('mitra');
 Route::get('/academy', [GeneralControlllers::class, 'academy'])->name('academy');
 
-require __DIR__ . '/auth.php';
+
 Route::middleware(['auth'])->group(function () {
 
     // Ini adalah rute default Breeze setelah login.
@@ -50,3 +50,5 @@ Route::middleware(['auth:web'])->group(function () {
     });
     Route::get('/api/transaction-status/{invoice_number}', [App\Http\Controllers\PaymentController::class, 'getTransactionStatus']);
 });
+
+require __DIR__.'/auth.php';

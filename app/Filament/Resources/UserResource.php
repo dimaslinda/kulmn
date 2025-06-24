@@ -34,6 +34,12 @@ class UserResource extends Resource
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
+                Forms\Components\TextInput::make('username')
+                    ->required()
+                    ->label('username login')
+                    ->unique()
+                    ->maxLength(255),
+
                 // Kolom email_verified_at sudah dihapus dari model dan DB, jadi tidak perlu di sini
                 Forms\Components\TextInput::make('password')
                     ->password()

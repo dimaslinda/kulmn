@@ -18,11 +18,7 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -56,6 +52,11 @@ class User extends Authenticatable
     {
         // return $this->isAdmin();
         return true;
+    }
+
+    public function findForAuth(string $username): ?static
+    {
+        return static::where('username', $username)->first();
     }
 
     public function isAdmin(): bool
