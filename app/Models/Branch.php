@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use App\Models\Scopes\BranchScope;
 
 class Branch extends Model implements HasMedia
 {
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new BranchScope);
+    }
     use HasFactory, InteractsWithMedia;
 
     protected $guarded = [];
