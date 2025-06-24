@@ -1,5 +1,33 @@
 @extends('layouts.main')
+
+@section('title', 'Kulmn Barbershop - Be Cool, Be a Man, with Kulmn')
+@section('description',
+    'Kulmn Barbershop adalah tempat pangkas rambut pria modern yang menawarkan gaya terkini dan
+    pelayanan profesional. Temukan gaya terbaikmu bersama kami.')
+@section('keywords',
+    'kulmn barbershop, pangkas rambut pria, gaya rambut modern, potong rambut profesional, barbershop
+    terbaik')
+@section('og:image', asset('img/general/og-image-homepage.webp'))
+
 @section('kepala')
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Kulmn Barbershop - Be Cool, Be a Man, with Kulmn",
+      "description": "Kulmn Barbershop adalah tempat pangkas rambut pria modern yang menawarkan gaya terkini dan pelayanan profesional. Temukan gaya terbaikmu bersama kami.",
+      "url": "{{ url('/') }}",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Kulmn Barbershop",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "{{ asset('img/general/logo.webp') }}"
+        }
+      }
+    }
+    </script>
     <!-- SwiperJS CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 @endsection
