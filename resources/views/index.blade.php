@@ -91,79 +91,28 @@
                 <div class="swiper mySwiper">
                     <div class="swiper-wrapper">
                         <!-- Slide 1 -->
-                        <div class="swiper-slide gap-4 md:gap-8">
-                            <div class="flex flex-col md:flex-row">
-                                <div class="flex-1 flex justify-end">
-                                    <img src="{{ asset('img/general/slideprofile.webp') }}" alt="KULMN Kota Bambu"
-                                        class="w-full md:w-3/4 object-cover shadow-lg">
+                        @foreach ($branches as $branch)
+                            <div class="swiper-slide gap-4 md:gap-8">
+                                <div class="flex flex-col md:flex-row">
+                                    <div class="flex-1 flex justify-end">
+                                        @if ($branch->getMedia('images')->first())
+                                            <img src="{{ $branch->getMedia('images')->first()->getUrl() }}"
+                                                alt="{{ $branch->name }}" class="w-full md:w-3/4 object-cover shadow-lg">
+                                        @else
+                                            <img src="{{ asset('img/general/slideprofile.webp') }}"
+                                                alt="{{ $branch->name }}" class="w-full md:w-3/4 object-cover shadow-lg">
+                                        @endif
+                                    </div>
+                                    <div class="flex-1 flexjustify-start">
+                                        {!! $branch->map_url !!}
+                                    </div>
                                 </div>
-                                <div class="flex-1 flexjustify-start">
-                                    <iframe src="https://www.google.com/maps?q=KULMN+BARBERSHOP,+Kota+Bambu&output=embed"
-                                        class="border-0 w-full md:w-3/4 h-full" allowfullscreen="" loading="lazy"
-                                        referrerpolicy="no-referrer-when-downgrade"></iframe>
-                                </div>
-                            </div>
-                            <div
-                                class="text-white font-poppins text-2xl md:text-4xl mt-5 text-center uppercase italic font-light">
-                                kulmn kota bambu
-                            </div>
-                        </div>
-                        <!-- Slide 2 -->
-                        <div class="swiper-slide gap-4 md:gap-8">
-                            <div class="flex flex-col md:flex-row">
-                                <div class="flex-1 flex justify-end">
-                                    <img src="{{ asset('img/general/slideprofile.webp') }}" alt="KULMN Kota Bambu"
-                                        class="w-full md:w-3/4 object-cover shadow-lg">
-                                </div>
-                                <div class="flex-1 flexjustify-start">
-                                    <iframe src="https://www.google.com/maps?q=KULMN+BARBERSHOP,+Kota+Bambu&output=embed"
-                                        class="border-0 w-full md:w-3/4 h-full" allowfullscreen="" loading="lazy"
-                                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                <div
+                                    class="text-white font-poppins text-2xl md:text-4xl mt-5 text-center uppercase italic font-light">
+                                    {{ $branch->name }}
                                 </div>
                             </div>
-                            <div
-                                class="text-white font-poppins text-2xl md:text-4xl mt-5 text-center uppercase italic font-light">
-                                kulmn kota bambu
-                            </div>
-                        </div>
-
-                        {{-- slide 3 --}}
-                        <div class="swiper-slide gap-4 md:gap-8">
-                            <div class="flex flex-col md:flex-row">
-                                <div class="flex-1 flex justify-end">
-                                    <img src="{{ asset('img/general/slideprofile.webp') }}" alt="KULMN Kota Bambu"
-                                        class="w-full md:w-3/4 object-cover shadow-lg">
-                                </div>
-                                <div class="flex-1 flexjustify-start">
-                                    <iframe src="https://www.google.com/maps?q=KULMN+BARBERSHOP,+Kota+Bambu&output=embed"
-                                        class="border-0 w-full md:w-3/4 h-full" allowfullscreen="" loading="lazy"
-                                        referrerpolicy="no-referrer-when-downgrade"></iframe>
-                                </div>
-                            </div>
-                            <div
-                                class="text-white font-poppins text-2xl md:text-4xl mt-5 text-center uppercase italic font-light">
-                                kulmn kota bambu
-                            </div>
-                        </div>
-
-                        {{-- slide 4 --}}
-                        <div class="swiper-slide gap-4 md:gap-8">
-                            <div class="flex flex-col md:flex-row">
-                                <div class="flex-1 flex justify-end">
-                                    <img src="{{ asset('img/general/slideprofile.webp') }}" alt="KULMN Kota Bambu"
-                                        class="w-full md:w-3/4 object-cover shadow-lg">
-                                </div>
-                                <div class="flex-1 flexjustify-start">
-                                    <iframe src="https://www.google.com/maps?q=KULMN+BARBERSHOP,+Kota+Bambu&output=embed"
-                                        class="border-0 w-full md:w-3/4 h-full" allowfullscreen="" loading="lazy"
-                                        referrerpolicy="no-referrer-when-downgrade"></iframe>
-                                </div>
-                            </div>
-                            <div
-                                class="text-white font-poppins text-2xl md:text-4xl mt-5 text-center uppercase italic font-light">
-                                kulmn kota bambu
-                            </div>
-                        </div>
+                        @endforeach
 
                     </div>
                     <!-- Navigasi panah -->
