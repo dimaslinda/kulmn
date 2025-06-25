@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\MidtransWebhookController;
 use App\Models\Service;
+use App\Models\Product;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -27,6 +28,11 @@ Route::post('/midtrans-webhook', [MidtransWebhookController::class, 'handler']);
 // Rute API untuk mendapatkan daftar layanan
 Route::get('/services', function () {
     return response()->json(Service::where('is_active', true)->get());
+});
+
+// Rute API untuk mendapatkan daftar produk
+Route::get('/products', function () {
+    return response()->json(Product::where('is_active', true)->get());
 });
 
 // --- Rute API Baru untuk Polling Status Transaksi ---

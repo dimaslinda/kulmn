@@ -35,6 +35,8 @@ Route::middleware(['auth'])->group(function () {
             'selectedBranchCode' => $user->branch ? $user->branch->code : 'UNASSIGNED', // Placeholder jika tidak ada cabang
         ]);
     })->name('pos.home');
+
+    Route::post('/api/create-cash-transaction', [PaymentController::class, 'createCashTransaction']);
 });
 
 // --- Rute Callback Midtrans (Tidak Membutuhkan Autentikasi) ---
@@ -51,4 +53,4 @@ Route::middleware(['auth:web'])->group(function () {
     Route::get('/api/transaction-status/{invoice_number}', [App\Http\Controllers\PaymentController::class, 'getTransactionStatus']);
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

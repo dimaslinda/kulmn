@@ -6,6 +6,7 @@ use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -41,6 +42,17 @@ class ProductResource extends Resource
                     ->numeric()
                     ->prefix('Rp')
                     ->minValue(0),
+                Forms\Components\TextInput::make('link')
+                    ->label('Link')
+                    ->url()
+                    ->maxLength(255)
+                    ->nullable(),
+                SpatieMediaLibraryFileUpload::make('image')
+                    ->label('Gambar')
+                    ->collection('product_images')
+                    ->imageEditor()
+                    ->hint('Gambar yang ditampilkan di halaman produk')
+                    ->image(),
                 Forms\Components\Textarea::make('description')
                     ->maxLength(65535)
                     ->nullable(),

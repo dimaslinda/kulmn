@@ -41,7 +41,9 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        \Illuminate\Support\Facades\Log::info('Attempting authentication with credentials:', $this->only('username', 'password'));
         if (! Auth::attempt($this->only('username', 'password'), $this->boolean('remember'))) {
+            \Illuminate\Support\Facades\Log::warning('Authentication failed for username:', ['username' => $this->input('username')]);
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -49,6 +51,7 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        \Illuminate\Support\Facades\Log::info('Authentication successful for user:', ['user_id' => Auth::id()]);
         RateLimiter::clear($this->throttleKey());
     }
 

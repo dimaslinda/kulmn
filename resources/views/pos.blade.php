@@ -15,81 +15,125 @@
 
     <style>
         /* ... (CSS yang sudah ada di sini) ... */
-        .add-to-cart-btn {
-            transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+        .service-item.selected {
+            background-color: #fcd34d;
+            /* yellow-300 */
         }
 
-        /* Style untuk tombol yang menunjukkan item sudah ada di keranjang */
-        .add-to-cart-btn.in-cart {
-            background-color: #f59e0b;
-            /* Warna kuning */
-            color: white;
+        .quantity-control-btn {
+            background-color: #e5e7eb;
+            /* gray-200 */
+            color: #4b5563;
+            /* gray-700 */
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            /* full rounded */
+            font-weight: bold;
+            transition: background-color 0.2s ease-in-out;
         }
 
-        .add-to-cart-btn.in-cart:hover {
-            background-color: #d97706;
-            /* Warna kuning gelap saat hover */
+        .quantity-control-btn:hover {
+            background-color: #d1d5db;
+            /* gray-300 */
         }
 
-        /* Style untuk tombol yang disabled (misal jika tidak ada cabang valid) */
-        .add-to-cart-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        .quantity-display {
+            min-width: 2rem;
+            text-align: center;
+            font-weight: bold;
         }
     </style>
 </head>
 
-<body class="bg-gray-100 p-8">
-    <h1 class="text-3xl font-bold mb-6 text-center">
-        Barbershop POS
-        @isset($selectedBranchCode)
-            <span class="text-blue-600">({{ $selectedBranchCode }})</span>
-        @else
-            <span class="text-gray-500">(Cabang Tidak Terhubung)</span>
-        @endisset
-    </h1>
-
-    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-2xl font-semibold mb-4">Layanan Tersedia</h2>
-        <div id="services-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <p>Loading services...</p>
-        </div>
-
-        <hr class="my-6">
-
-        <h2 class="text-2xl font-semibold mb-4">Keranjang Belanja</h2>
-        <div id="cart-items" class="mb-4">
-            <p>Keranjang kosong.</p>
-        </div>
-
-        <div class="text-right text-xl font-bold mb-4">
-            Total: <span id="cart-total">Rp 0</span>
-        </div>
-
-        <button id="pay-button"
-            class="w-full bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-            Bayar Sekarang (QRIS)
-        </button>
-
-        <div id="payment-result"
-            class="mt-6 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-md hidden">
-            <p id="result-message" class="font-semibold"></p>
-            <p id="result-invoice"></p>
-            <p id="result-total"></p>
-            <p id="result-status"></p>
-            <div id="qr-code-display" class="mt-4 text-center">
-                <img id="qr-image" src="" alt="QRIS Code"
-                    class="mx-auto w-48 h-48 border border-gray-300 rounded-md">
-                <p class="text-sm text-gray-600 mt-2">Scan QRIS ini untuk pembayaran.</p>
+<body class="bg-gray-100 p-8 font-sans">
+    <div class="max-w-6xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">Pilih Layanan</h1>
+                <div class="flex space-x-4 mb-4">
+                    <button id="service-tab" class="px-6 py-2 rounded-md font-semibold text-white bg-yellow-600">SERVICE</button>
+                    <button id="product-tab" class="px-6 py-2 rounded-md font-semibold text-gray-700">PRODUCT</button>
+                </div>
             </div>
-            <p class="text-sm text-gray-500 mt-2">Status pembayaran akan diperbarui secara otomatis.</p>
-            <a href="/" class="block mt-4 text-center text-blue-600 hover:underline">Buat Transaksi Baru</a>
+            <div class="text-right">
+                <!-- Order No. and Date removed as per user request -->
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8">
+            <!-- Left Column: Service/Product List -->
+            <div>
+                <div id="service-content" class="space-y-2">
+                    <p>Loading services...</p>
+                </div>
+                <div id="product-content" class="space-y-2 hidden">
+                    <p>Loading products...</p>
+                </div>
+            </div>
+
+            <!-- Right Column: Cart Summary -->
+            <div>
+                <div class="border-b pb-2 mb-4">
+                    <h3 class="font-semibold text-gray-700">PRODUCT</h3>
+                </div>
+                <div id="cart-summary-items" class="space-y-2 mb-4">
+                    <!-- Cart items will be rendered here -->
+                    <p class="text-gray-500">Keranjang kosong.</p>
+                </div>
+
+                <div class="flex justify-between items-center border-t pt-4 mt-4">
+                    <span class="text-xl font-bold">Total</span>
+                    <span id="cart-total-summary" class="text-xl font-bold">Rp 0</span>
+                </div>
+
+                <div class="mt-6">
+                    <button id="qris-pay-button"
+                        class="w-full bg-black text-white py-3 px-4 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-opacity-50">
+                        BAYAR DENGAN QRIS
+                    </button>
+                    <button id="cash-pay-button"
+                        class="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 mt-2">
+                        BAYAR TUNAI
+                    </button>
+                </div>
+
+                <div id="cash-payment-section" class="mt-6 p-4 border border-gray-300 rounded-md hidden">
+                    <h4 class="font-semibold mb-3">Pembayaran Tunai</h4>
+                    <div class="mb-3">
+                        <label for="amount-paid" class="block text-sm font-medium text-gray-700">Jumlah Dibayar (Rp)</label>
+                        <input type="number" id="amount-paid" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm p-2" placeholder="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="change-amount" class="block text-sm font-medium text-gray-700">Kembalian (Rp)</label>
+                        <input type="text" id="change-amount" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 sm:text-sm p-2" readonly>
+                    </div>
+                    <button id="process-cash-payment" class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 mt-2">
+                        PROSES PEMBAYARAN TUNAI
+                    </button>
+                </div>
+
+                <div id="payment-result"
+                    class="mt-6 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-md hidden">
+                    <p id="result-message" class="font-semibold"></p>
+                    <p id="result-invoice"></p>
+                    <p id="result-total"></p>
+                    <p id="result-status"></p>
+                    <div id="qr-code-display" class="mt-4 text-center">
+                        <img id="qr-image" src="" alt="QRIS Code"
+                            class="mx-auto w-48 h-48 border border-gray-300 rounded-md">
+                        <p class="text-sm text-gray-600 mt-2">Scan QRIS ini untuk pembayaran.</p>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">Status pembayaran akan diperbarui secara otomatis.</p>
+                    <a href="/" class="block mt-4 text-center text-blue-600 hover:underline">Buat Transaksi Baru</a>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         let services = [];
-        let cart = {}; // {service_id: quantity}
+        let products = [];
+        let cart = {}; // { itemId: { quantity: X, type: 'service'|'product', name: '...', price: ... } }
         let paymentPollingInterval;
         let currentInvoiceNumber = '';
 
@@ -98,136 +142,187 @@
 
 
         document.addEventListener('DOMContentLoaded', async () => {
-            await fetchServices();
+            await fetchData();
             updateCartDisplay();
         });
 
-        async function fetchServices() {
+        async function fetchData() {
             try {
-                const response = await fetch('/api/services');
-                const data = await response.json();
-                services = data;
-                renderServices();
+                const serviceResponse = await fetch('/api/services');
+                if (!serviceResponse.ok) {
+                    throw new Error(`HTTP error! status: ${serviceResponse.status} from /api/services`);
+                }
+                const serviceData = await serviceResponse.json();
+                services = serviceData;
+
+                const productResponse = await fetch('/api/products'); // Assuming a /api/products endpoint
+                if (!productResponse.ok) {
+                    throw new Error(`HTTP error! status: ${productResponse.status} from /api/products`);
+                }
+                const productData = await productResponse.json();
+                products = productData;
+
+                renderItems(services, 'service-content', 'service');
+                attachItemListeners('service-content');
+
+                renderItems(products, 'product-content', 'product');
+                attachItemListeners('product-content');
+
+                // Set initial tab state
+                document.getElementById('service-tab').click();
+
+                // Tab functionality
+                document.getElementById('service-tab').addEventListener('click', () => {
+                    currentTab = 'service';
+                    document.getElementById('service-content').classList.remove('hidden');
+                    document.getElementById('product-content').classList.add('hidden');
+                    document.getElementById('service-tab').classList.add('bg-yellow-600', 'text-white');
+                    document.getElementById('service-tab').classList.remove('bg-gray-200', 'text-gray-700');
+                    document.getElementById('product-tab').classList.remove('bg-yellow-600', 'text-white');
+                    document.getElementById('product-tab').classList.add('bg-gray-200', 'text-gray-700');
+                    updateItemStates();
+                });
+
+                document.getElementById('product-tab').addEventListener('click', () => {
+                    currentTab = 'product';
+                    document.getElementById('product-content').classList.remove('hidden');
+                    document.getElementById('service-content').classList.add('hidden');
+                    document.getElementById('product-tab').classList.add('bg-yellow-600', 'text-white');
+                    document.getElementById('product-tab').classList.remove('bg-gray-200', 'text-gray-700');
+                    document.getElementById('service-tab').classList.remove('bg-yellow-600', 'text-white');
+                    document.getElementById('service-tab').classList.add('bg-gray-200', 'text-gray-700');
+                    updateItemStates();
+                });
+
             } catch (error) {
-                console.error('Error fetching services:', error);
-                document.getElementById('services-list').innerHTML =
-                    '<p class="text-red-500">Gagal memuat layanan. Pastikan API services berfungsi.</p>';
+                console.error('Error fetching data:', error);
+                document.getElementById('service-content').innerHTML =
+                    '<p class="text-red-500">Gagal memuat data. Silakan coba lagi nanti.</p>';
+                document.getElementById('product-content').innerHTML =
+                    '<p class="text-red-500">Gagal memuat data. Silakan coba lagi nanti.</p>';
             }
         }
 
-        function renderServices() {
-            const servicesList = document.getElementById('services-list');
-            servicesList.innerHTML = '';
-            if (services.length === 0) {
-                servicesList.innerHTML =
-                    '<p>Belum ada layanan yang ditambahkan. Silakan tambahkan melalui panel admin.</p>';
+        let currentTab = 'service'; // 'service' or 'product'
+
+        function renderItems(items, containerId, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            if (items.length === 0) {
+                container.innerHTML =
+                    `<p class="text-gray-500">Belum ada ${type} yang ditambahkan. Silakan tambahkan melalui panel admin.</p>`;
                 return;
             }
 
-            services.forEach(service => {
-                const serviceCard = document.createElement('div');
-                serviceCard.className =
-                    'bg-white p-4 border border-gray-200 rounded-md shadow-sm flex justify-between items-center';
-                serviceCard.innerHTML = `
+            items.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className =
+                    'service-item bg-white p-4 border border-gray-300 rounded-md flex justify-between items-center cursor-pointer';
+                itemCard.dataset.id = item.id;
+                itemCard.dataset.type = type; // 'service' or 'product'
+                itemCard.innerHTML = `
                     <div>
-                        <h3 class="text-lg font-semibold">${service.name}</h3>
-                        <p class="text-gray-600">Rp ${parseFloat(service.price).toLocaleString('id-ID')}</p>
+                        <h3 class="text-lg font-medium">${item.name}</h3>
                     </div>
-                    <button class="add-to-cart-btn bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600" data-id="${service.id}" data-name="${service.name}" data-price="${service.price}">
-                        Tambahkan
-                    </button>
+                    <div class="font-semibold">Rp ${parseFloat(item.price).toLocaleString('id-ID')}</div>
                 `;
-                servicesList.appendChild(serviceCard);
+                container.appendChild(itemCard);
             });
 
-            attachServiceButtonListeners();
-            updateServiceButtonStates();
+            attachItemListeners();
+            updateItemStates();
         }
 
-        function attachServiceButtonListeners() {
-            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-                button.removeEventListener('click', handleAddServiceToCart);
-                button.addEventListener('click', handleAddServiceToCart);
+        function attachItemListeners() {
+            document.querySelectorAll('.service-item').forEach(item => {
+                item.removeEventListener('click', handleItemClick);
+                item.addEventListener('click', handleItemClick);
             });
         }
 
-        function handleAddServiceToCart(e) {
-            const id = e.target.dataset.id;
+        function handleItemClick(e) {
+            const id = e.currentTarget.dataset.id;
+            const type = e.currentTarget.dataset.type;
+            const uniqueId = `${type}-${id}`;
+            const item = (type === 'service' ? services : products).find(s => s.id == id);
 
-            // --- PERBAIKAN DI SINI: Izinkan penambahan berulang ---
-            if (cart[id]) {
-                cart[id]++; // Tingkatkan kuantitas
+            if (cart[uniqueId]) {
+                // If already in cart, do nothing on click, quantity is controlled by +/- buttons
             } else {
-                cart[id] = 1; // Tambahkan item baru dengan kuantitas 1
+                cart[uniqueId] = { quantity: 1, type: type, name: item.name, price: item.price, originalId: id }; // Store type, name, price, and originalId
             }
-            // --- AKHIR PERBAIKAN ---
-
             updateCartDisplay();
-            updateServiceButtonStates();
+            updateItemStates();
         }
 
         function updateCartDisplay() {
-            const cartItemsDiv = document.getElementById('cart-items');
-            const cartTotalSpan = document.getElementById('cart-total');
+            const cartSummaryItemsDiv = document.getElementById('cart-summary-items');
+            const cartTotalSummarySpan = document.getElementById('cart-total-summary');
             let total = 0;
-            cartItemsDiv.innerHTML = '';
+            cartSummaryItemsDiv.innerHTML = '';
 
             if (Object.keys(cart).length === 0) {
-                cartItemsDiv.innerHTML = '<p>Keranjang kosong.</p>';
-                cartTotalSpan.textContent = 'Rp 0';
-                updateServiceButtonStates();
+                cartSummaryItemsDiv.innerHTML = '<p class="text-gray-500">Keranjang kosong.</p>';
+                cartTotalSummarySpan.textContent = 'Rp 0';
+                updateItemStates();
                 return;
             }
 
-            for (const serviceId in cart) {
-                const quantity = cart[serviceId]; // PERBAIKAN: Ambil kuantitas dari cart object
-                const service = services.find(s => s.id == serviceId);
-                if (service) {
-                    const itemTotal = service.price * quantity;
-                    total += itemTotal;
+            for (const uniqueId in cart) {
+                const itemInCart = cart[uniqueId];
+                const quantity = itemInCart.quantity;
+                const itemTotal = itemInCart.price * quantity;
+                total += itemTotal;
 
-                    const cartItemDiv = document.createElement('div');
-                    cartItemDiv.className = 'flex justify-between items-center bg-gray-50 p-2 rounded-md mb-2';
-                    cartItemDiv.innerHTML = `
-                        <span>${service.name} x <span class="font-bold">${quantity}</span></span> <div>
-                            <span>Rp ${parseFloat(itemTotal).toLocaleString('id-ID')}</span>
-                            <button class="remove-from-cart-btn text-red-500 hover:text-red-700 ml-4" data-id="${service.id}">Hapus</button>
-                        </div>
-                    `;
-                    cartItemsDiv.appendChild(cartItemDiv);
-                }
+                const cartItemDiv = document.createElement('div');
+                cartItemDiv.className = 'flex justify-between items-center';
+                cartItemDiv.innerHTML = `
+                    <span class="text-gray-700">${itemInCart.name}</span>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-semibold">Rp ${parseFloat(itemTotal).toLocaleString('id-ID')}</span>
+                        <button class="quantity-control-btn decrease-quantity" data-id="${uniqueId}">-</button>
+                        <span class="quantity-display">${quantity}</span>
+                        <button class="quantity-control-btn increase-quantity" data-id="${uniqueId}">+</button>
+                    </div>
+                `;
+                cartSummaryItemsDiv.appendChild(cartItemDiv);
             }
-            cartTotalSpan.textContent = `Rp ${parseFloat(total).toLocaleString('id-ID')}`;
+            cartTotalSummarySpan.textContent = `Rp ${parseFloat(total).toLocaleString('id-ID')}`;
 
-            document.querySelectorAll('.remove-from-cart-btn').forEach(button => {
+            document.querySelectorAll('.increase-quantity').forEach(button => {
                 button.addEventListener('click', (e) => {
-                    const id = e.target.dataset.id;
-                    if (cart[id]) {
-                        delete cart[id]; // Hapus seluruh item dari keranjang
+                    const uniqueId = e.target.dataset.id;
+                    cart[uniqueId].quantity++;
+                    updateCartDisplay();
+                    updateItemStates();
+                });
+            });
+
+            document.querySelectorAll('.decrease-quantity').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const uniqueId = e.target.dataset.id;
+                    if (cart[uniqueId].quantity > 1) {
+                        cart[uniqueId].quantity--;
+                    } else {
+                        delete cart[uniqueId];
                     }
                     updateCartDisplay();
-                    updateServiceButtonStates();
+                    updateItemStates();
                 });
             });
         }
 
-        function updateServiceButtonStates() {
-            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-                const serviceId = button.dataset.id;
+        function updateItemStates() {
+            document.querySelectorAll('.service-item').forEach(item => {
+                const itemId = item.dataset.id;
+                const itemType = item.dataset.type;
+                const uniqueId = `${itemType}-${itemId}`;
 
-                // --- PERBAIKAN DI SINI: Sesuaikan teks dan gaya tombol ---
-                if (cart[serviceId]) {
-                    button.textContent = `Tambah Lagi (${cart[serviceId]})`; // Tampilkan kuantitas saat ini
-                    button.classList.remove('bg-green-500', 'hover:bg-green-600');
-                    button.classList.add('in-cart'); // Gunakan class 'in-cart' untuk styling
+                if (cart[uniqueId] && cart[uniqueId].type === itemType) {
+                    item.classList.add('selected');
                 } else {
-                    button.textContent = 'Tambahkan';
-                    button.classList.remove('in-cart');
-                    button.classList.add('bg-green-500', 'hover:bg-green-600');
+                    item.classList.remove('selected');
                 }
-                // Pastikan tombol selalu aktif (tidak disabled) kecuali ada validasi lain
-                button.disabled = false;
-                // --- AKHIR PERBAIKAN ---
             });
         }
 
@@ -265,16 +360,143 @@
             }
         }
 
-        document.getElementById('pay-button').addEventListener('click', async () => {
-            const serviceIds = [];
-            const quantities = [];
+        document.getElementById('qris-pay-button').addEventListener('click', async () => {
+            // Existing QRIS payment logic
+        });
 
-            for (const serviceId in cart) {
-                serviceIds.push(parseInt(serviceId));
-                quantities.push(cart[serviceId]); // Kirim kuantitas yang sebenarnya dari keranjang
+        document.getElementById('cash-pay-button').addEventListener('click', () => {
+            const cashPaymentSection = document.getElementById('cash-payment-section');
+            const qrisPayButton = document.getElementById('qris-pay-button');
+            // const payButton = document.getElementById('pay-button'); // This is the old pay-button, now qris-pay-button
+
+            if (cashPaymentSection.classList.contains('hidden')) {
+                cashPaymentSection.classList.remove('hidden');
+                qrisPayButton.classList.add('hidden');
+                // payButton.classList.add('hidden'); // Hide the QRIS button when cash is selected
+            } else {
+                cashPaymentSection.classList.add('hidden');
+                qrisPayButton.classList.remove('hidden');
+                // payButton.classList.remove('hidden'); // Show the QRIS button when cash is deselected
+            }
+        });
+
+        document.getElementById('amount-paid').addEventListener('input', () => {
+            const amountPaidInput = document.getElementById('amount-paid');
+            const changeAmountInput = document.getElementById('change-amount');
+            const totalAmount = parseFloat(document.getElementById('cart-total-summary').textContent.replace('Rp ', '').replace(/\./g, '').replace(/,/g, '.'));
+            const amountPaid = parseFloat(amountPaidInput.value);
+
+            if (!isNaN(amountPaid) && amountPaid >= totalAmount) {
+                const change = amountPaid - totalAmount;
+                changeAmountInput.value = `Rp ${change.toLocaleString('id-ID')}`;
+            } else if (!isNaN(amountPaid) && amountPaid < totalAmount) {
+                changeAmountInput.value = `Kurang Rp ${(totalAmount - amountPaid).toLocaleString('id-ID')}`;
+            } else {
+                changeAmountInput.value = '';
+            }
+        });
+
+        document.getElementById('process-cash-payment').addEventListener('click', async () => {
+            const amountPaidInput = document.getElementById('amount-paid');
+            const totalAmount = parseFloat(document.getElementById('cart-total-summary').textContent.replace('Rp ', '').replace(/\./g, '').replace(/,/g, '.'));
+            const amountPaid = parseFloat(amountPaidInput.value);
+
+            if (Object.keys(cart).length === 0) {
+                alert('Keranjang belanja kosong. Silakan tambahkan layanan terlebih dahulu.');
+                return;
             }
 
-            if (serviceIds.length === 0) {
+            if (isNaN(amountPaid) || amountPaid < totalAmount) {
+                alert('Jumlah pembayaran tunai tidak mencukupi atau tidak valid.');
+                return;
+            }
+
+            const itemsToSend = [];
+            for (const itemId in cart) {
+                const itemInCart = cart[itemId];
+                itemsToSend.push({
+                    id: itemInCart.originalId,
+                    quantity: itemInCart.quantity,
+                    type: itemInCart.type
+                });
+            }
+
+            if (!selectedBranchId || selectedBranchId === 'null' || selectedBranchCode === 'UNASSIGNED') {
+                alert('Tidak dapat membuat transaksi: Akun Anda tidak terhubung ke cabang yang valid.');
+                return;
+            }
+
+            document.getElementById('process-cash-payment').disabled = true;
+            document.getElementById('process-cash-payment').textContent = 'Memproses...';
+
+            try {
+                const response = await fetch('/api/create-cash-transaction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        items: itemsToSend,
+                        branch_id: selectedBranchId,
+                        amount_paid: amountPaid,
+                        total_amount: totalAmount
+                    })
+                });
+
+                const result = await response.json();
+                const paymentResultDiv = document.getElementById('payment-result');
+
+                if (response.ok) {
+                    document.getElementById('result-message').textContent = result.message;
+                    document.getElementById('result-invoice').textContent = `Nomor Invoice: ${result.invoice_number}`;
+                    document.getElementById('result-total').textContent = `Jumlah Total: Rp ${parseFloat(result.total_amount).toLocaleString('id-ID')}`;
+                    document.getElementById('result-status').textContent = `Status: ${result.transaction_status}`;
+                    document.getElementById('qr-code-display').style.display = 'none'; // No QR for cash
+                    paymentResultDiv.classList.remove('hidden', 'bg-yellow-100', 'border-yellow-400', 'text-yellow-700');
+                    paymentResultDiv.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+                    cart = {};
+                    updateCartDisplay();
+                    document.getElementById('cash-payment-section').classList.add('hidden');
+                    document.getElementById('qris-pay-button').classList.remove('hidden');
+                    amountPaidInput.value = '';
+                    document.getElementById('change-amount').value = '';
+
+                } else {
+                    document.getElementById('result-message').textContent = `Gagal membuat transaksi tunai: ${result.message || 'Terjadi kesalahan'}`;
+                    document.getElementById('qr-code-display').style.display = 'none';
+                    paymentResultDiv.classList.remove('hidden', 'bg-green-100', 'border-green-400', 'text-green-700');
+                    paymentResultDiv.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+                }
+                paymentResultDiv.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error:', error);
+                const paymentResultDiv = document.getElementById('payment-result');
+                document.getElementById('result-message').textContent = `Terjadi kesalahan jaringan: ${error.message}`;
+                document.getElementById('qr-code-display').style.display = 'none';
+                paymentResultDiv.classList.remove('hidden', 'bg-green-100', 'border-green-400', 'text-green-700');
+                paymentResultDiv.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } finally {
+                document.getElementById('process-cash-payment').disabled = false;
+                document.getElementById('process-cash-payment').textContent = 'PROSES PEMBAYARAN TUNAI';
+            }
+        });
+
+        // Original QRIS payment button listener (renamed from pay-button to qris-pay-button)
+        document.getElementById('qris-pay-button').addEventListener('click', async () => {
+            const itemsToSend = [];
+
+            for (const itemId in cart) {
+                const itemInCart = cart[itemId];
+                itemsToSend.push({
+                    id: itemInCart.originalId,
+                    quantity: itemInCart.quantity,
+                    type: itemInCart.type
+                });
+            }
+
+            if (itemsToSend.length === 0) {
                 alert('Keranjang belanja kosong. Silakan tambahkan layanan terlebih dahulu.');
                 return;
             }
@@ -284,10 +506,12 @@
             // selectedBranchCode bisa 'UNASSIGNED'.
             if (!selectedBranchId || selectedBranchId === 'null' || selectedBranchCode === 'UNASSIGNED') {
                 alert('Tidak dapat membuat transaksi: Akun Anda tidak terhubung ke cabang yang valid.');
-                document.getElementById('pay-button').disabled = false; // Aktifkan kembali tombol
-                document.getElementById('pay-button').textContent = 'Bayar Sekarang (QRIS)';
+                document.getElementById('qris-pay-button').disabled = false; // Aktifkan kembali tombol
+                document.getElementById('qris-pay-button').textContent = 'LANJUTKAN';
                 return; // Hentikan eksekusi jika validasi gagal
             }
+
+
             // --- AKHIR PERBAIKAN ---
 
 
@@ -295,8 +519,8 @@
                 clearInterval(paymentPollingInterval);
             }
 
-            document.getElementById('pay-button').disabled = true;
-            document.getElementById('pay-button').textContent = 'Memproses Pembayaran...';
+            document.getElementById('qris-pay-button').disabled = true;
+            document.getElementById('qris-pay-button').textContent = 'Memproses...';
 
             try {
                 const response = await fetch('/api/create-qris-transaction', {
@@ -307,11 +531,8 @@
                             'content')
                     },
                     body: JSON.stringify({
-                        service_ids: serviceIds,
-                        quantities: quantities,
-                        // --- PERBAIKAN DI SINI: Kirim selectedBranchId ke API ---
+                        items: itemsToSend,
                         branch_id: selectedBranchId
-                        // --- AKHIR PERBAIKAN ---
                     })
                 });
 
@@ -357,8 +578,8 @@
                     'text-green-700');
                 paymentResultDiv.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
             } finally {
-                document.getElementById('pay-button').disabled = false;
-                document.getElementById('pay-button').textContent = 'Bayar Sekarang (QRIS)';
+                document.getElementById('qris-pay-button').disabled = false;
+                document.getElementById('qris-pay-button').textContent = 'LANJUTKAN';
             }
         });
     </script>

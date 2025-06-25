@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Branch;
-use App\Models\Transaction;
-use App\Models\Service;
-use App\Models\TransactionDetail;
-use App\Models\Product; // Tambahkan ini jika menggunakan produk
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Exception;
 use Midtrans\Config;
 use Midtrans\CoreApi;
-use Exception;
+use App\Models\Branch;
+use App\Models\Service;
+use App\Models\Transaction;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\TransactionDetail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Product; // Tambahkan ini jika menggunakan produk
+use App\Models\Stock; // Tambahkan ini jika menggunakan model Stock
 
 class PaymentController extends Controller
 {
@@ -25,15 +28,110 @@ class PaymentController extends Controller
         Config::$is3ds = config('midtrans.is_3ds');
     }
 
+    public function createCashTransaction(Request $request)
+    {
+        $request->validate([
+            'items' => 'required|array',
+            'items.*.id' => 'required|integer',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.type' => 'required|in:service,product',
+            'branch_id' => 'required|integer',
+            'amount_paid' => 'required|numeric|min:0',
+            'total_amount' => 'required|numeric|min:0'
+        ]);
+
+        try {
+            // Ensure user is authenticated
+            $user = Auth::user();
+            if (!$user) {
+                throw new \Exception('User not authenticated.');
+            }
+            // Logging (optional, bisa dihapus jika tidak perlu)
+            Log::info('Authenticated User: ' . $user->name);
+            Log::info('Auth ID: ' . $user->id);
+            Log::info('Session ID: ' . session()->getId());
+
+            DB::beginTransaction();
+
+            // Ambil data cabang dari user yang sedang login
+            $branch = $user->branch;
+            $branchId = $branch ? $branch->id : $request->branch_id;
+            $branchCode = $branch ? $branch->code : 'UNASSIGNED';
+            $branchName = $branch ? $branch->name : 'UNASSIGNED';
+            // Format invoice number: KodeCabang-NamaCabangSingkat-TIMESTAMP-RANDOM
+            $invoiceNumber = strtoupper($branchCode) . '-' . strtoupper(Str::slug($branchName, '_')) . '-' . time() . '-' . Str::random(5);
+
+            // Create transaction
+            $transaction = Transaction::create([
+                'invoice_number' => $invoiceNumber,
+                'user_id' => $user->id,
+                'branch_id' => $branchId,
+                'total_amount' => $request->total_amount,
+                'amount_paid' => $request->amount_paid,
+                'payment_method' => 'cash',
+                'payment_status' => 'success', // status cash = success
+                'transaction_date' => now()
+            ]);
+
+            // Process items
+            foreach ($request->items as $item) {
+                if ($item['type'] === 'service') {
+                    $service = Service::find($item['id']);
+                    if (!$service) {
+                        throw new \Exception('Service not found');
+                    }
+
+                    TransactionDetail::create([
+                        'transaction_id' => $transaction->id,
+                        'service_id' => $item['id'],
+                        'quantity' => $item['quantity'],
+                        'price' => $service->price,
+                        'subtotal' => $service->price * $item['quantity']
+                    ]);
+                } else {
+                    $product = Product::find($item['id']);
+                    if (!$product) {
+                        throw new \Exception('Product not found');
+                    }
+
+                    TransactionDetail::create([
+                        'transaction_id' => $transaction->id,
+                        'product_id' => $item['id'],
+                        'quantity' => $item['quantity'],
+                        'price' => $product->price,
+                        'subtotal' => $product->price * $item['quantity']
+                    ]);
+                    // Kurangi stok produk di cabang terkait
+                    Stock::where('product_id', $product->id)->where('branch_id', $branchId)->decrement('quantity', $item['quantity']);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaksi tunai berhasil dibuat',
+                'invoice_number' => $invoiceNumber,
+                'total_amount' => $request->total_amount,
+                'transaction_status' => 'completed'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to create cash transaction: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat transaksi tunai: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function createTransaction(Request $request)
     {
         $request->validate([
-            'service_ids' => 'required_without:product_ids|array', // Salah satu harus ada
-            'service_ids.*' => 'exists:services,id',
-            'product_ids' => 'required_without:service_ids|array', // Salah satu harus ada
-            'product_ids.*' => 'exists:products,id',
-            'quantities' => 'required|array', // Kuantitas untuk layanan atau produk
-            'quantities.*' => 'required|integer|min:1',
+            'items' => 'required|array',
+            'items.*.id' => 'required|integer',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.type' => 'required|string|in:service,product',
             'branch_id' => 'required|exists:branches,id', // Validasi branch_id dari frontend
         ]);
 
@@ -57,48 +155,45 @@ class PaymentController extends Controller
             $totalAmount = 0;
             $transactionDetails = [];
 
-            // Proses Layanan
-            if ($request->has('service_ids') && is_array($request->service_ids)) {
-                foreach ($request->service_ids as $key => $serviceId) {
-                    $service = Service::find($serviceId);
-                    if (!$service) {
-                        throw new Exception("Layanan dengan ID {$serviceId} tidak ditemukan.");
+            // Proses Items (Layanan dan Produk)
+            foreach ($request->items as $itemData) {
+                $id = $itemData['id'];
+                $quantity = $itemData['quantity'];
+                $type = $itemData['type'];
+
+                if ($type === 'service') {
+                    $item = Service::find($id);
+                    if (!$item) {
+                        throw new Exception("Layanan dengan ID {$id} tidak ditemukan.");
                     }
-                    $quantity = $request->quantities[$key]; // Kuantitas ini akan selalu 1
-                    $subtotal = $service->price * $quantity;
+                    $subtotal = $item->price * $quantity;
                     $totalAmount += $subtotal;
 
                     $transactionDetails[] = [
-                        'service_id' => $service->id,
+                        'service_id' => $item->id,
                         'quantity' => $quantity,
-                        'price' => $service->price,
+                        'price' => $item->price,
                         'subtotal' => $subtotal,
                         'type' => 'service',
                     ];
-                }
-            }
-
-            // Proses Produk (jika ada)
-            if ($request->has('product_ids') && is_array($request->product_ids)) {
-                foreach ($request->product_ids as $key => $productId) {
-                    $product = Product::find($productId);
-                    if (!$product) {
-                        throw new Exception("Produk dengan ID {$productId} tidak ditemukan.");
+                } elseif ($type === 'product') {
+                    $item = Product::find($id);
+                    if (!$item) {
+                        throw new Exception("Produk dengan ID {$id} tidak ditemukan.");
                     }
-                    $quantity = $request->quantities[$key + (count($request->service_ids ?? []))]; // Ambil kuantitas yang sesuai
-                    $subtotal = $product->price * $quantity;
+                    $subtotal = $item->price * $quantity;
                     $totalAmount += $subtotal;
 
                     $transactionDetails[] = [
-                        'product_id' => $product->id,
+                        'product_id' => $item->id,
                         'quantity' => $quantity,
-                        'price' => $product->price,
+                        'price' => $item->price,
                         'subtotal' => $subtotal,
                         'type' => 'product',
                     ];
 
-                    // TODO: Implementasi pengurangan stok di sini atau setelah notifikasi Midtrans (Webhook)
-                    // Misalnya: Stock::where('product_id', $product->id)->where('branch_id', $branchId)->decrement('quantity', $quantity);
+                    // Kurangi stok produk di cabang terkait
+                    Stock::where('product_id', $item->id)->where('branch_id', $branchId)->decrement('quantity', $quantity);
                 }
             }
 
@@ -115,6 +210,10 @@ class PaymentController extends Controller
 
             foreach ($transactionDetails as $detail) {
                 $transaction->transactionDetails()->create($detail);
+                if ($detail['type'] === 'product') {
+                    // Kurangi stok produk di cabang terkait
+                    Stock::where('product_id', $detail['product_id'])->where('branch_id', $branchId)->decrement('quantity', $detail['quantity']);
+                }
             }
 
             $midtrans_params = [
@@ -123,10 +222,19 @@ class PaymentController extends Controller
                     'gross_amount' => $totalAmount,
                 ],
                 'item_details' => array_map(function ($detail) {
+                    $item = null;
+                    $itemId = null;
+
                     if ($detail['type'] === 'service') {
                         $item = Service::find($detail['service_id']);
-                    } else { // 'product'
+                        $itemId = $detail['service_id'];
+                    } elseif ($detail['type'] === 'product') {
                         $item = Product::find($detail['product_id']);
+                        $itemId = $detail['product_id'];
+                    }
+
+                    if (!$item) {
+                        throw new Exception("Item dengan ID {$itemId} dan tipe {$detail['type']} tidak ditemukan.");
                     }
 
                     return [
@@ -175,7 +283,7 @@ class PaymentController extends Controller
                 return response()->json(['message' => 'Gagal membuat transaksi QRIS dengan Midtrans.', 'details' => $midtrans_charge_response], 500);
             }
         } catch (Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error creating transaction: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Error creating transaction: ' . $e->getMessage() . '\nStack Trace: ' . $e->getTraceAsString());
             return response()->json(['message' => 'Terjadi kesalahan saat membuat transaksi.', 'error' => $e->getMessage()], 500);
         }
     }

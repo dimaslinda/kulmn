@@ -14,8 +14,10 @@ return new class extends Migration
             $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
             $table->string('invoice_number')->unique();
             $table->decimal('total_amount', 10, 2);
+            $table->decimal('amount_paid', 10, 2)->default(0);
             $table->string('payment_method')->nullable(); // 'QRIS'
             $table->string('payment_status')->default('pending'); // pending, success, failed, expire
+            $table->string('transaction_status')->nullable(); // pending, success, failed, expired
             $table->string('midtrans_transaction_id')->nullable(); // ID dari Midtrans
             $table->string('midtrans_order_id')->nullable(); // Order ID yang kita kirim ke Midtrans
             $table->string('midtrans_qr_code_url')->nullable(); // URL QRIS
