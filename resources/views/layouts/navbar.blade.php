@@ -7,7 +7,7 @@
         </a>
         <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
 
-            <a href="/registrasi"
+            <a href="https://wa.me/62895411871843" target="_blank"
                 class="text-white font-inter cursor-pointer uppercase bg-transparent border-2 border-tombol hover:text-hitam hover:bg-tombol focus:ring-4 focus:outline-none focus:ring-navbar font-medium text-sm px-6 md:px-9 py-2 text-center">
                 konsultasi
             </a>

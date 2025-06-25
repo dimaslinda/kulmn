@@ -69,7 +69,7 @@
                         modal yang terjangkau, sistem operasional yang mudah, dan potensi keuntungan yang stabil.
                     </div>
                     <div class="flex w-full">
-                        <a href="/registrasi"
+                        <a href="https://wa.me/62895411871843" target="_blank"
                             class="text-white w-full font-inter cursor-pointer uppercase bg-transparent border-2 border-tombol hover:text-hitam hover:bg-tombol focus:ring-4 focus:outline-none focus:ring-navbar font-medium text-sm px-6 md:px-9 py-2 text-center">
                             konsultasi sekarang
                         </a>

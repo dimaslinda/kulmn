@@ -65,7 +65,7 @@
                         Tumbuh dan Maju Bersama KULMN!
                     </div>
                     <div class="flex w-full">
-                        <a href="/registrasi"
+                        <a href="https://wa.me/62895411871843" target="_blank"
                             class="text-white w-full font-inter cursor-pointer uppercase bg-transparent border-2 border-tombol hover:text-hitam hover:bg-tombol focus:ring-4 focus:outline-none focus:ring-navbar font-medium text-sm px-6 md:px-9 py-2 text-center">
                             selengkapnya
                         </a>
@@ -91,7 +91,7 @@
                 <div class="swiper mySwiper">
                     <div class="swiper-wrapper">
                         <!-- Slide 1 -->
-                        @foreach ($branches as $branch)
+                        @forelse ($branches as $branch)
                             <div class="swiper-slide gap-4 md:gap-8">
                                 <div class="flex flex-col md:flex-row">
                                     <div class="flex-1 flex justify-end">
@@ -112,7 +112,13 @@
                                     {{ $branch->name }}
                                 </div>
                             </div>
-                        @endforeach
+                        @empty
+                            <div class="swiper-slide">
+                                <div class="text-white text-center font-poppins text-xl py-10">
+                                    Tidak ada data cabang tersedia.
+                                </div>
+                            </div>
+                        @endforelse
 
                     </div>
                     <!-- Navigasi panah -->
@@ -182,7 +188,7 @@
                             teori terkini hingga layanan pelanggan yang profesional. Ingin jadi capster profesional?
                             Daftar sekarang di Academy Capster kami!
                         </div>
-                        <a href="#"
+                        <a href="https://wa.me/62895411871843" target="_blank"
                             class="inline-block bg-hitam text-white font-poppins font-semibold px-6 py-2 transition hover:bg-[#222] w-fit">
                             DAFTAR
                         </a>
@@ -311,161 +317,40 @@
                 <div class="relative w-full">
                     <div class="swiper productSwiper">
                         <div class="swiper-wrapper">
-                            <!-- Slide 1 -->
-                            <div class="swiper-slide flex flex-col items-center h-full">
-                                <div
-                                    class="flex flex-col justify-between h-full w-full bg-transparent p-4 rounded-lg min-h-[500px]">
-                                    <div>
-                                        <div class="relative flex flex-col items-center min-h-[180px]">
-                                            <img src='{{ asset('img/general/product/pomade-clay.webp') }}'
-                                                alt="pomade clay" class="w-full object-contain z-10 max-h-[200px]" />
+                            @forelse($products as $product)
+                                <div class="swiper-slide flex flex-col items-center h-full">
+                                    <div
+                                        class="flex flex-col justify-between h-full w-full bg-transparent p-4 rounded-lg min-h-[500px]">
+                                        <div>
+                                            <div class="relative flex flex-col items-center min-h-[180px]">
+                                                @php
+                                                    $productImage = $product->getFirstMediaUrl('product_images');
+                                                @endphp
+                                                <img src="{{ $productImage ?: asset('img/general/produk-default.webp') }}"
+                                                    alt="{{ $product->name ?? 'produk' }}"
+                                                    class="w-full object-contain z-10 max-h-[200px]" />
+                                            </div>
+                                            <div
+                                                class="text-hitam uppercase text-center font-poppins text-lg my-4 font-bold tracking-widest line-clamp-2">
+                                                {{ $product->name ?? '-' }}
+                                            </div>
+                                            <div class="mb-5 text-center font-poppins">
+                                                {{ $product->description ?? '' }}
+                                            </div>
                                         </div>
-                                        <div
-                                            class="text-hitam uppercase text-center font-poppins text-lg my-4 font-bold tracking-widest line-clamp-2">
-                                            Pomade Clay Mud
+                                        <div class="mt-auto">
+                                            <a href="{{ $product->link ?? '#' }}" target="_blank"
+                                                class="inline-block bg-black text-white font-poppins font-semibold px-6 py-3 transition hover:bg-[#222] w-full text-center uppercase">
+                                                pesan sekarang
+                                            </a>
                                         </div>
-                                        <div class="mb-5 text-center font-poppins">
-                                            Cocok untuk gaya rambut natural, bertekstur, dan bervolume tanpa terasa
-                                            lengket atau berminyak.
-                                        </div>
-                                    </div>
-                                    <div class="mt-auto">
-                                        <a href="#"
-                                            class="inline-block bg-black text-white font-poppins font-semibold px-6 py-3 transition hover:bg-[#222] w-full text-center uppercase">
-                                            pesan sekarang
-                                        </a>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- Slide 2 -->
-                            <div class="swiper-slide flex flex-col items-center h-full">
-                                <div
-                                    class="flex flex-col justify-between h-full w-full bg-transparent p-4 rounded-lg min-h-[500px]">
-                                    <div>
-                                        <div class="relative flex flex-col items-center min-h-[180px]">
-                                            <img src='{{ asset('img/general/product/clay-mud.webp') }}' alt="clay mud"
-                                                class="w-full object-contain z-10 max-h-[200px]" />
-                                        </div>
-                                        <div
-                                            class="text-hitam uppercase text-center font-poppins text-lg my-4 font-bold tracking-widest line-clamp-2">
-                                            CLAY MUD CHARCOAL
-                                        </div>
-                                        <div class="mb-5 text-center font-poppins">
-                                            Untuk gaya rambut natural dengan tekstur yang kuat namun tetap ringan.
-                                        </div>
-                                    </div>
-                                    <div class="mt-auto">
-                                        <a href="#"
-                                            class="inline-block bg-black text-white font-poppins font-semibold px-6 py-3 transition hover:bg-[#222] w-full text-center uppercase">
-                                            pesan sekarang
-                                        </a>
-                                    </div>
+                            @empty
+                                <div class="w-full text-center text-gray-500 py-10">
+                                    Produk belum tersedia.
                                 </div>
-                            </div>
-                            <!-- Slide 3 -->
-                            <div class="swiper-slide flex flex-col items-center h-full">
-                                <div
-                                    class="flex flex-col justify-between h-full w-full bg-transparent p-4 rounded-lg min-h-[500px]">
-                                    <div>
-                                        <div class="relative flex flex-col items-center min-h-[180px]">
-                                            <img src='{{ asset('img/general/product/pomade-cool.webp') }}'
-                                                alt="pomade cool" class="w-full object-contain z-10 max-h-[200px]" />
-                                        </div>
-                                        <div
-                                            class="text-hitam uppercase text-center font-poppins text-lg my-4 font-bold tracking-widest line-clamp-2">
-                                            Pomade Cool Mens Water Based
-                                        </div>
-                                        <div class="mb-5 text-center font-poppins">
-                                            Pomade berbahan dasar air yang memberikan kilau sedang, daya rekat kuat, dan
-                                            aroma maskulin menyegarkan.
-                                        </div>
-                                    </div>
-                                    <div class="mt-auto">
-                                        <a href="#"
-                                            class="inline-block bg-black text-white font-poppins font-semibold px-6 py-3 transition hover:bg-[#222] w-full text-center uppercase">
-                                            pesan sekarang
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Slide 1 -->
-                            <div class="swiper-slide flex flex-col items-center h-full">
-                                <div
-                                    class="flex flex-col justify-between h-full w-full bg-transparent p-4 rounded-lg min-h-[500px]">
-                                    <div>
-                                        <div class="relative flex flex-col items-center min-h-[180px]">
-                                            <img src='{{ asset('img/general/product/pomade-clay.webp') }}'
-                                                alt="pomade clay" class="w-full object-contain z-10 max-h-[200px]" />
-                                        </div>
-                                        <div
-                                            class="text-hitam uppercase text-center font-poppins text-lg my-4 font-bold tracking-widest line-clamp-2">
-                                            Pomade Clay Mud
-                                        </div>
-                                        <div class="mb-5 text-center font-poppins">
-                                            Cocok untuk gaya rambut natural, bertekstur, dan bervolume tanpa terasa
-                                            lengket atau berminyak.
-                                        </div>
-                                    </div>
-                                    <div class="mt-auto">
-                                        <a href="#"
-                                            class="inline-block bg-black text-white font-poppins font-semibold px-6 py-3 transition hover:bg-[#222] w-full text-center uppercase">
-                                            pesan sekarang
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Slide 2 -->
-                            <div class="swiper-slide flex flex-col items-center h-full">
-                                <div
-                                    class="flex flex-col justify-between h-full w-full bg-transparent p-4 rounded-lg min-h-[500px]">
-                                    <div>
-                                        <div class="relative flex flex-col items-center min-h-[180px]">
-                                            <img src='{{ asset('img/general/product/clay-mud.webp') }}' alt="clay mud"
-                                                class="w-full object-contain z-10 max-h-[200px]" />
-                                        </div>
-                                        <div
-                                            class="text-hitam uppercase text-center font-poppins text-lg my-4 font-bold tracking-widest line-clamp-2">
-                                            CLAY MUD CHARCOAL
-                                        </div>
-                                        <div class="mb-5 text-center font-poppins">
-                                            Untuk gaya rambut natural dengan tekstur yang kuat namun tetap ringan.
-                                        </div>
-                                    </div>
-                                    <div class="mt-auto">
-                                        <a href="#"
-                                            class="inline-block bg-black text-white font-poppins font-semibold px-6 py-3 transition hover:bg-[#222] w-full text-center uppercase">
-                                            pesan sekarang
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Slide 3 -->
-                            <div class="swiper-slide flex flex-col items-center h-full">
-                                <div
-                                    class="flex flex-col justify-between h-full w-full bg-transparent p-4 rounded-lg min-h-[500px]">
-                                    <div>
-                                        <div class="relative flex flex-col items-center min-h-[180px]">
-                                            <img src='{{ asset('img/general/product/pomade-cool.webp') }}'
-                                                alt="pomade cool" class="w-full object-contain z-10 max-h-[200px]" />
-                                        </div>
-                                        <div
-                                            class="text-hitam uppercase text-center font-poppins text-lg my-4 font-bold tracking-widest line-clamp-2">
-                                            Pomade Cool Mens Water Based
-                                        </div>
-                                        <div class="mb-5 text-center font-poppins">
-                                            Pomade berbahan dasar air yang memberikan kilau sedang, daya rekat kuat, dan
-                                            aroma maskulin menyegarkan.
-                                        </div>
-                                    </div>
-                                    <div class="mt-auto">
-                                        <a href="#"
-                                            class="inline-block bg-black text-white font-poppins font-semibold px-6 py-3 transition hover:bg-[#222] w-full text-center uppercase">
-                                            pesan sekarang
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                            @endforelse
                         </div>
                         <!-- Navigasi panah -->
                         <div class="product-swiper-nav-btn-prev">
