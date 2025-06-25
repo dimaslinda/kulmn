@@ -2,19 +2,23 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\BranchResource\Pages;
-use App\Filament\Resources\BranchResource\RelationManagers;
-use App\Models\Branch;
 use Filament\Forms;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Branch;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Http;
+use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\BranchResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\BranchResource\RelationManagers;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use App\Filament\Resources\BranchResource\Widgets\BestBranchOverview;
+use App\Filament\Resources\BranchResource\Widgets\TotalRevenueOverview;
+use App\Filament\Resources\BranchResource\Widgets\TotalCustomersOverview;
+use App\Filament\Resources\BranchResource\Widgets\AverageTransactionOverview;
 
 
 class BranchResource extends Resource
@@ -86,7 +90,7 @@ class BranchResource extends Resource
                         Forms\Components\ViewField::make('map_url')
                             ->label('Google Map Embed')
                             ->view('filament.forms.components.google-map')
-                            ->hidden(fn (callable $get): bool => ! $get('map_url'))
+                            ->hidden(fn(callable $get): bool => ! $get('map_url'))
 
                     ]),
 
@@ -162,6 +166,28 @@ class BranchResource extends Resource
             'index' => Pages\ListBranches::route('/'),
             'create' => Pages\CreateBranch::route('/create'),
             'edit' => Pages\EditBranch::route('/{record}/edit'),
+        ];
+    }
+
+    // Tambahkan atau modifikasi bagian ini
+    public static function getWidgets(): array
+    {
+        return [
+            TotalRevenueOverview::class,
+            TotalCustomersOverview::class,
+            AverageTransactionOverview::class,
+            BestBranchOverview::class,
+        ];
+    }
+
+    // Opsi: Jika Anda ingin widget muncul di halaman daftar resource
+    public static function getHeaderWidgets(): array
+    {
+        return [
+            TotalRevenueOverview::class,
+            TotalCustomersOverview::class,
+            AverageTransactionOverview::class,
+            BestBranchOverview::class,
         ];
     }
 }

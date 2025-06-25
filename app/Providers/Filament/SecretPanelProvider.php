@@ -2,6 +2,11 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\BranchResource\Widgets\AverageTransactionOverview;
+use App\Filament\Resources\BranchResource\Widgets\BestBranchOverview;
+use App\Filament\Resources\BranchResource\Widgets\TotalCustomersOverview;
+use App\Filament\Resources\BranchResource\Widgets\TotalRevenueOverview;
+use App\Filament\Widgets\DashboardStatsContainer;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -39,6 +44,11 @@ class SecretPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
+                TotalRevenueOverview::class,
+                TotalCustomersOverview::class,
+                AverageTransactionOverview::class,
+                BestBranchOverview::class,
+                // DashboardStatsContainer::class
             ])
             ->middleware([
                 EncryptCookies::class,
