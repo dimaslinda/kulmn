@@ -10,6 +10,7 @@ class RevenuePerBranchChart extends ChartWidget
 {
     protected static ?string $heading = 'Pendapatan Per Cabang'; // Judul widget
 
+    protected static ?int $sort = 4;
     // Anda bisa menyesuaikan tinggi chart jika perlu
     // protected static ?int $contentHeight = 300;
 
@@ -20,15 +21,18 @@ class RevenuePerBranchChart extends ChartWidget
 
     protected function getData(): array
     {
-        // Ambil semua cabang
-        $branches = Branch::all();
+        // Ambil 10 cabang dengan pendapatan terbesar
+        $branches = Branch::withSum(['transactions as total_amount' => function ($q) {
+            $q->where('payment_status', 'success');
+        }], 'total_amount')
+            ->orderByDesc('total_amount')
+            ->limit(10)
+            ->get();
         $labels = [];
         $revenues = [];
         foreach ($branches as $branch) {
             $labels[] = $branch->name;
-            $total = $branch->transactions()
-                ->where('payment_status', 'success')
-                ->sum('total_amount');
+            $total = $branch->total_amount ?? 0;
             $revenues[] = $total / 1000000; // Dalam juta rupiah
         }
         return [
@@ -45,6 +49,11 @@ class RevenuePerBranchChart extends ChartWidget
         ];
     }
 
+    /**
+     * Opsi konfigurasi chart yang digunakan.
+     *
+     * @return array
+     */
     protected function getOptions(): array
     {
         return [

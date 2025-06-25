@@ -12,6 +12,7 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 class AverageTransactionOverview extends BaseWidget
 {
     protected static ?string $pollingInterval = '30s';
+    protected static ?int $sort = 1;
 
 
     protected function getStats(): array
