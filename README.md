@@ -96,5 +96,4 @@ Situs Web Kulmn Barbershop adalah perangkat lunak open-source yang dilisensikan 
 
 Untuk pertanyaan atau dukungan, silakan hubungi kami di:
 
--   Email: info@kulmnbarbershop.com
--   Website: [kulmnbarbershop.com](http://kulmnbarbershop.com)
+-   Email: deniasitudimas@gmail.com
