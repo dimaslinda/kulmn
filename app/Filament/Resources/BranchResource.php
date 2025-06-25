@@ -13,12 +13,9 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\BranchResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Widgets\AverageTransactionOverview;
 use App\Filament\Resources\BranchResource\RelationManagers;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use App\Filament\Resources\BranchResource\Widgets\BestBranchOverview;
-use App\Filament\Resources\BranchResource\Widgets\TotalRevenueOverview;
-use App\Filament\Resources\BranchResource\Widgets\TotalCustomersOverview;
-use App\Filament\Resources\BranchResource\Widgets\AverageTransactionOverview;
 
 
 class BranchResource extends Resource
@@ -173,10 +170,7 @@ class BranchResource extends Resource
     public static function getWidgets(): array
     {
         return [
-            TotalRevenueOverview::class,
-            TotalCustomersOverview::class,
             AverageTransactionOverview::class,
-            BestBranchOverview::class,
         ];
     }
 
@@ -184,10 +178,7 @@ class BranchResource extends Resource
     public static function getHeaderWidgets(): array
     {
         return [
-            TotalRevenueOverview::class,
-            TotalCustomersOverview::class,
             AverageTransactionOverview::class,
-            BestBranchOverview::class,
         ];
     }
 }
