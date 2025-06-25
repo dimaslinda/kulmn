@@ -25,7 +25,57 @@
     <div class="max-w-6xl mx-auto p-8 rounded-lg shadow-md">
         <div class="flex items-start mb-6">
             <div class="w-full border-b border-hitam">
-                <h1 class="text-3xl font-bold mb-5 font-poppins">Pilih Layanan</h1>
+                <div class="flex justify-between">
+                    <h1 class="text-3xl font-bold mb-5 font-poppins">Pilih Layanan</h1>
+
+                    <button data-modal-target="popup-modal" data-modal-toggle="popup-modal"
+                        class="bg-tombol hover:bg-tombol/80 text-hitam cursor-pointer font-bold py-2 px-4 rounded"
+                        type="button">
+                        logout
+                    </button>
+
+                    <div id="popup-modal" tabindex="-1"
+                        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                        <div class="relative p-4 w-full max-w-md max-h-full">
+                            <div class="relative bg-tombol rounded-lg shadow-sm">
+                                <button type="button"
+                                    class="absolute top-3 end-2.5 text-hitam bg-transparent cursor-pointer text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+                                    data-modal-hide="popup-modal">
+                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                        fill="none" viewBox="0 0 14 14">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
+                                <div class="p-4 md:p-5 text-center">
+                                    <svg class="mx-auto mb-4 text-red-500 w-12 h-12" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                    <h3 class="mb-5 text-lg font-normal text-hitam">
+                                        apakah anda yakin ingin logout?
+                                    </h3>
+                                    <div class="flex justify-center">
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit"
+                                                class="bg-red-500 hover:bg-red-400 text-white cursor-pointer font-bold py-2.5 px-5 ms-3 rounded">
+                                                Logout
+                                            </button>
+                                        </form>
+                                        <button data-modal-hide="popup-modal" type="button"
+                                            class="py-2.5 px-5 ms-3 text-sm font-medium text-white focus:outline-none cursor-pointer bg-hitam rounded hover:bg-hitam/80">
+                                            No, cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="flex w-1/2 space-x-4 mb-4">
                     <div class="w-full">
                         <button id="service-tab"
@@ -274,9 +324,9 @@
                     <span class="text-gray-700">${itemInCart.name}</span>
                     <div class="flex items-center space-x-2">
                         <span class="font-semibold">Rp ${parseFloat(itemTotal).toLocaleString('id-ID')}</span>
-                        <button class="quantity-control-btn decrease-quantity" data-id="${uniqueId}">-</button>
+                        <button class="quantity-control-btn decrease-quantity cursor-pointer" data-id="${uniqueId}">-</button>
                         <span class="quantity-display">${quantity}</span>
-                        <button class="quantity-control-btn increase-quantity" data-id="${uniqueId}">+</button>
+                        <button class="quantity-control-btn increase-quantity cursor-pointer" data-id="${uniqueId}">+</button>
                     </div>
                 `;
                 cartSummaryItemsDiv.appendChild(cartItemDiv);
