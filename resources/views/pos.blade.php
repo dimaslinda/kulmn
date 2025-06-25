@@ -8,55 +8,34 @@
             - {{ $selectedBranchCode }}
         @endisset
     </title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="selected-branch-id" content="{{ $selectedBranchId ?? '' }}">
     <meta name="selected-branch-code" content="{{ $selectedBranchCode ?? '' }}">
 
-    <style>
-        /* ... (CSS yang sudah ada di sini) ... */
-        .service-item.selected {
-            background-color: #fcd34d;
-            /* yellow-300 */
-        }
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
 
-        .quantity-control-btn {
-            background-color: #e5e7eb;
-            /* gray-200 */
-            color: #4b5563;
-            /* gray-700 */
-            padding: 0.25rem 0.6rem;
-            border-radius: 9999px;
-            /* full rounded */
-            font-weight: bold;
-            transition: background-color 0.2s ease-in-out;
-        }
 
-        .quantity-control-btn:hover {
-            background-color: #d1d5db;
-            /* gray-300 */
-        }
-
-        .quantity-display {
-            min-width: 2rem;
-            text-align: center;
-            font-weight: bold;
-        }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-gray-100 p-8 font-sans">
-    <div class="max-w-6xl mx-auto bg-white p-8 rounded-lg shadow-md">
-        <div class="flex justify-between items-start mb-6">
-            <div>
-                <h1 class="text-3xl font-bold mb-2">Pilih Layanan</h1>
-                <div class="flex space-x-4 mb-4">
-                    <button id="service-tab" class="px-6 py-2 rounded-md font-semibold text-white bg-yellow-600">SERVICE</button>
-                    <button id="product-tab" class="px-6 py-2 rounded-md font-semibold text-gray-700">PRODUCT</button>
+<body class="p-8 font-poppins">
+    <div class="max-w-6xl mx-auto p-8 rounded-lg shadow-md">
+        <div class="flex items-start mb-6">
+            <div class="w-full border-b border-hitam">
+                <h1 class="text-3xl font-bold mb-5 font-poppins">Pilih Layanan</h1>
+                <div class="flex w-1/2 space-x-4 mb-4">
+                    <div class="w-full">
+                        <button id="service-tab"
+                            class="px-6 py-2 w-full cursor-pointer font-semibold text-white bg-tombol">SERVICE</button>
+                    </div>
+                    <div class="w-full">
+                        <button id="product-tab"
+                            class="px-6 py-2 w-full cursor-pointer font-semibold text-gray-700">PRODUCT</button>
+                    </div>
                 </div>
-            </div>
-            <div class="text-right">
-                <!-- Order No. and Date removed as per user request -->
             </div>
         </div>
 
@@ -88,11 +67,11 @@
 
                 <div class="mt-6">
                     <button id="qris-pay-button"
-                        class="w-full bg-black text-white py-3 px-4 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-opacity-50">
+                        class="w-full bg-hitam cursor-pointer text-white py-3 px-4 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-opacity-50">
                         BAYAR DENGAN QRIS
                     </button>
                     <button id="cash-pay-button"
-                        class="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 mt-2">
+                        class="w-full bg-tombol cursor-pointer text-hitam py-3 px-4 rounded-md hover:bg-tombol/80 mt-2">
                         BAYAR TUNAI
                     </button>
                 </div>
@@ -100,14 +79,21 @@
                 <div id="cash-payment-section" class="mt-6 p-4 border border-gray-300 rounded-md hidden">
                     <h4 class="font-semibold mb-3">Pembayaran Tunai</h4>
                     <div class="mb-3">
-                        <label for="amount-paid" class="block text-sm font-medium text-gray-700">Jumlah Dibayar (Rp)</label>
-                        <input type="number" id="amount-paid" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm p-2" placeholder="0">
+                        <label for="amount-paid" class="block text-sm font-medium text-gray-700">Jumlah Dibayar
+                            (Rp)</label>
+                        <input type="number" id="amount-paid"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 sm:text-sm p-2"
+                            placeholder="0">
                     </div>
                     <div class="mb-3">
-                        <label for="change-amount" class="block text-sm font-medium text-gray-700">Kembalian (Rp)</label>
-                        <input type="text" id="change-amount" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 sm:text-sm p-2" readonly>
+                        <label for="change-amount" class="block text-sm font-medium text-gray-700">Kembalian
+                            (Rp)</label>
+                        <input type="text" id="change-amount"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 sm:text-sm p-2"
+                            readonly>
                     </div>
-                    <button id="process-cash-payment" class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 mt-2">
+                    <button id="process-cash-payment"
+                        class="w-full bg-hitam cursor-pointer text-white py-3 px-4 rounded-md hover:bg-hitam/80 mt-2">
                         PROSES PEMBAYARAN TUNAI
                     </button>
                 </div>
@@ -124,12 +110,14 @@
                         <p class="text-sm text-gray-600 mt-2">Scan QRIS ini untuk pembayaran.</p>
                     </div>
                     <p class="text-sm text-gray-500 mt-2">Status pembayaran akan diperbarui secara otomatis.</p>
-                    <a href="/" class="block mt-4 text-center text-blue-600 hover:underline">Buat Transaksi Baru</a>
+                    <a href="/" class="block mt-4 text-center text-blue-600 hover:underline">Buat Transaksi
+                        Baru</a>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
     <script>
         let services = [];
         let products = [];
@@ -176,9 +164,9 @@
                     currentTab = 'service';
                     document.getElementById('service-content').classList.remove('hidden');
                     document.getElementById('product-content').classList.add('hidden');
-                    document.getElementById('service-tab').classList.add('bg-yellow-600', 'text-white');
+                    document.getElementById('service-tab').classList.add('bg-tombol', 'text-white');
                     document.getElementById('service-tab').classList.remove('bg-gray-200', 'text-gray-700');
-                    document.getElementById('product-tab').classList.remove('bg-yellow-600', 'text-white');
+                    document.getElementById('product-tab').classList.remove('bg-tombol', 'text-white');
                     document.getElementById('product-tab').classList.add('bg-gray-200', 'text-gray-700');
                     updateItemStates();
                 });
@@ -187,9 +175,9 @@
                     currentTab = 'product';
                     document.getElementById('product-content').classList.remove('hidden');
                     document.getElementById('service-content').classList.add('hidden');
-                    document.getElementById('product-tab').classList.add('bg-yellow-600', 'text-white');
+                    document.getElementById('product-tab').classList.add('bg-tombol', 'text-white');
                     document.getElementById('product-tab').classList.remove('bg-gray-200', 'text-gray-700');
-                    document.getElementById('service-tab').classList.remove('bg-yellow-600', 'text-white');
+                    document.getElementById('service-tab').classList.remove('bg-tombol', 'text-white');
                     document.getElementById('service-tab').classList.add('bg-gray-200', 'text-gray-700');
                     updateItemStates();
                 });
@@ -249,7 +237,13 @@
             if (cart[uniqueId]) {
                 // If already in cart, do nothing on click, quantity is controlled by +/- buttons
             } else {
-                cart[uniqueId] = { quantity: 1, type: type, name: item.name, price: item.price, originalId: id }; // Store type, name, price, and originalId
+                cart[uniqueId] = {
+                    quantity: 1,
+                    type: type,
+                    name: item.name,
+                    price: item.price,
+                    originalId: id
+                }; // Store type, name, price, and originalId
             }
             updateCartDisplay();
             updateItemStates();
@@ -383,7 +377,8 @@
         document.getElementById('amount-paid').addEventListener('input', () => {
             const amountPaidInput = document.getElementById('amount-paid');
             const changeAmountInput = document.getElementById('change-amount');
-            const totalAmount = parseFloat(document.getElementById('cart-total-summary').textContent.replace('Rp ', '').replace(/\./g, '').replace(/,/g, '.'));
+            const totalAmount = parseFloat(document.getElementById('cart-total-summary').textContent.replace('Rp ',
+                '').replace(/\./g, '').replace(/,/g, '.'));
             const amountPaid = parseFloat(amountPaidInput.value);
 
             if (!isNaN(amountPaid) && amountPaid >= totalAmount) {
@@ -398,7 +393,8 @@
 
         document.getElementById('process-cash-payment').addEventListener('click', async () => {
             const amountPaidInput = document.getElementById('amount-paid');
-            const totalAmount = parseFloat(document.getElementById('cart-total-summary').textContent.replace('Rp ', '').replace(/\./g, '').replace(/,/g, '.'));
+            const totalAmount = parseFloat(document.getElementById('cart-total-summary').textContent.replace(
+                'Rp ', '').replace(/\./g, '').replace(/,/g, '.'));
             const amountPaid = parseFloat(amountPaidInput.value);
 
             if (Object.keys(cart).length === 0) {
@@ -434,7 +430,8 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content')
                     },
                     body: JSON.stringify({
                         items: itemsToSend,
@@ -449,11 +446,15 @@
 
                 if (response.ok) {
                     document.getElementById('result-message').textContent = result.message;
-                    document.getElementById('result-invoice').textContent = `Nomor Invoice: ${result.invoice_number}`;
-                    document.getElementById('result-total').textContent = `Jumlah Total: Rp ${parseFloat(result.total_amount).toLocaleString('id-ID')}`;
-                    document.getElementById('result-status').textContent = `Status: ${result.transaction_status}`;
+                    document.getElementById('result-invoice').textContent =
+                        `Nomor Invoice: ${result.invoice_number}`;
+                    document.getElementById('result-total').textContent =
+                        `Jumlah Total: Rp ${parseFloat(result.total_amount).toLocaleString('id-ID')}`;
+                    document.getElementById('result-status').textContent =
+                        `Status: ${result.transaction_status}`;
                     document.getElementById('qr-code-display').style.display = 'none'; // No QR for cash
-                    paymentResultDiv.classList.remove('hidden', 'bg-yellow-100', 'border-yellow-400', 'text-yellow-700');
+                    paymentResultDiv.classList.remove('hidden', 'bg-yellow-100', 'border-yellow-400',
+                        'text-yellow-700');
                     paymentResultDiv.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
                     cart = {};
                     updateCartDisplay();
@@ -463,9 +464,11 @@
                     document.getElementById('change-amount').value = '';
 
                 } else {
-                    document.getElementById('result-message').textContent = `Gagal membuat transaksi tunai: ${result.message || 'Terjadi kesalahan'}`;
+                    document.getElementById('result-message').textContent =
+                        `Gagal membuat transaksi tunai: ${result.message || 'Terjadi kesalahan'}`;
                     document.getElementById('qr-code-display').style.display = 'none';
-                    paymentResultDiv.classList.remove('hidden', 'bg-green-100', 'border-green-400', 'text-green-700');
+                    paymentResultDiv.classList.remove('hidden', 'bg-green-100', 'border-green-400',
+                        'text-green-700');
                     paymentResultDiv.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
                 }
                 paymentResultDiv.classList.remove('hidden');
@@ -473,9 +476,11 @@
             } catch (error) {
                 console.error('Error:', error);
                 const paymentResultDiv = document.getElementById('payment-result');
-                document.getElementById('result-message').textContent = `Terjadi kesalahan jaringan: ${error.message}`;
+                document.getElementById('result-message').textContent =
+                    `Terjadi kesalahan jaringan: ${error.message}`;
                 document.getElementById('qr-code-display').style.display = 'none';
-                paymentResultDiv.classList.remove('hidden', 'bg-green-100', 'border-green-400', 'text-green-700');
+                paymentResultDiv.classList.remove('hidden', 'bg-green-100', 'border-green-400',
+                    'text-green-700');
                 paymentResultDiv.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
             } finally {
                 document.getElementById('process-cash-payment').disabled = false;
