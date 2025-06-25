@@ -2,7 +2,7 @@
 
 Ini adalah situs web resmi untuk Kulmn Barbershop, dibangun dengan Laravel.
 
-## Fitur
+## Fitur Utama
 
 -   **Desain Modern**: Antarmuka pengguna yang bersih dan responsif.
 -   **SEO Optimized**: Mengimplementasikan tag meta Schema.org dan Open Graph untuk visibilitas mesin pencari yang lebih baik dan berbagi di media sosial.
@@ -13,74 +13,84 @@ Ini adalah situs web resmi untuk Kulmn Barbershop, dibangun dengan Laravel.
 
 ## Teknologi yang Digunakan
 
--   **Laravel**: Framework PHP untuk pengembangan web.
--   **Composer**: Manajer dependensi untuk PHP.
--   **Node.js & npm**: Lingkungan runtime JavaScript dan manajer paket.
--   **Vite**: Tool untuk kompilasi aset frontend.
--   **MySQL**: Sistem manajemen basis data relasional.
+-   **Backend**: Laravel 10.x
+-   **Frontend**: Blade Templates, Tailwind CSS
+-   **Database**: MySQL
+-   **Manajemen Paket**: Composer (PHP) & Node.js/npm (JavaScript)
+-   **Kompilasi Aset**: Vite
 
-## Installation
+## Prasyarat
 
-To set up the project locally, follow these steps:
+Sebelum menjalankan proyek ini, pastikan sistem Anda memiliki:
 
-1.  **Clone the repository:**
+-   PHP >= 8.1
+-   Composer
+-   Node.js & npm
+-   MySQL
+-   Web server (Apache/Nginx)
+
+## Instalasi
+
+Untuk mengatur proyek secara lokal, ikuti langkah-langkah berikut:
+
+1.  **Clone repositori:**
 
     ```bash
     git clone <repository_url>
     cd kulmn
     ```
 
-2.  **Install Composer dependencies:**
+2.  **Instal dependensi Composer:**
 
     ```bash
     composer install
     ```
 
-3.  **Install Node.js dependencies:**
+3.  **Instal dependensi Node.js:**
 
     ```bash
     npm install
     ```
 
-4.  **Copy the environment file:**
+4.  **Salin file lingkungan:**
 
     ```bash
     cp .env.example .env
     ```
 
-5.  **Generate an application key:**
+5.  **Buat kunci aplikasi:**
 
     ```bash
     php artisan key:generate
     ```
 
-6.  **Configure your database** in the `.env` file.
+6.  **Konfigurasi database Anda** di file `.env`.
 
-7.  **Run database migrations:**
+7.  **Jalankan migrasi database:**
 
     ```bash
     php artisan migrate
     ```
 
-8.  **Seed the database (optional):**
+8.  **Seed database (opsional):**
 
     ```bash
     php artisan db:seed
     ```
 
-9.  **Run Vite for asset compilation:**
+9.  **Jalankan Vite untuk kompilasi aset:**
 
     ```bash
     npm run dev
     ```
 
-10. **Start the Laravel development server:**
+10. **Mulai server pengembangan Laravel:**
 
     ```bash
     php artisan serve
     ```
 
-    The application will be available at `http://127.0.0.1:8000` (or similar).
+    Aplikasi akan tersedia di `http://127.0.0.1:8000` (atau serupa).
 
 ## Penggunaan
 
@@ -88,11 +98,35 @@ To set up the project locally, follow these steps:
 -   **Halaman Mitra**: Informasi untuk calon mitra.
 -   **Halaman Akademi**: Detail tentang program pelatihan tukang cukur.
 
+## Struktur Proyek
+
+```
+kulmn/
+├── app/
+│   ├── Filament/           # Sumber daya panel admin
+│   ├── Http/Controllers/   # Pengontrol
+│   ├── Models/            # Model Eloquent
+│   └── Services/          # Logika bisnis
+├── database/
+│   ├── migrations/        # Migrasi database
+│   └── seeders/          # Seeder database
+├── public/
+│   └── img/              # Gambar statis
+├── resources/
+│   └── views/            # Template Blade
+└── routes/
+    └── web.php           # Rute web
+```
+
 ## Kontribusi
 
-Situs Web Kulmn Barbershop adalah perangkat lunak open-source yang dilisensikan di bawah [lisensi MIT](https://opensource.org/licenses/MIT).
+Kontribusi sangat diterima! Silakan fork repositori dan kirimkan pull request.
 
-## Kontak
+## Lisensi
+
+Proyek ini dilisensikan di bawah [Lisensi MIT](https://opensource.org/licenses/MIT).
+
+## Dukungan
 
 Untuk pertanyaan atau dukungan, silakan hubungi kami di:
 
