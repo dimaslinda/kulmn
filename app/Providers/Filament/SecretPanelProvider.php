@@ -13,6 +13,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
 use App\Filament\Widgets\AverageTransactionOverview;
 use App\Filament\Widgets\BestBranchesList;
+use App\Filament\Widgets\BranchLeaderboard;
 use App\Filament\Widgets\PeakHoursChart;
 use App\Filament\Widgets\RevenuePerBranchChart;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -45,6 +46,7 @@ class SecretPanelProvider extends PanelProvider
                 RevenuePerBranchChart::class,
                 BestBranchesList::class,
                 PeakHoursChart::class,
+                BranchLeaderboard::class
             ])
             ->middleware([
                 EncryptCookies::class,

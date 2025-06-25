@@ -32,7 +32,7 @@
             <p class="text-sm text-gray-500">Mohon coba lagi atau hubungi admin.</p>
         @endif
 
-        <a href="/"
+        <a href="/pos"
             class="mt-6 inline-block bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Kembali ke POS</a>
     </div>
 </body>
