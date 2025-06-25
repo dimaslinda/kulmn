@@ -1,10 +1,5 @@
 <x-guest-layout>
     <x-authentication-card>
-        <x-slot name="logo">
-            <a href="/">
-                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-            </a>
-        </x-slot>
 
         <x-validation-errors class="mb-4" />
 
@@ -19,8 +14,8 @@
 
             <div>
                 <x-label for="username" value="{{ __('Username') }}" />
-                <x-input id="username" class="block mt-1 w-full" type="text" name="username" :value="old('username')"
-                    required autofocus autocomplete="username" />
+                <x-input id="username" class="block mt-1 w-full" type="text" name="username" :value="old('username')" required
+                    autofocus autocomplete="username" />
             </div>
 
             <div class="mt-4">
@@ -36,16 +31,9 @@
                 </label>
             </div>
 
-            <div class="flex items-center justify-end mt-4">
-                @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        href="{{ route('password.request') }}">
-                        {{ __('Forgot your password?') }}
-                    </a>
-                @endif
-
+            <div class="flex items-center w-full mt-4">
                 <x-button class="ms-4">
-                    {{ __('Log in') }}
+                    {{ __('Masuk') }}
                 </x-button>
             </div>
         </form>

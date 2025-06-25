@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
 use Carbon\Carbon;
+use Filament\Forms\Components\TextInput;
 
 class TransactionResource extends Resource
 {
@@ -33,7 +34,7 @@ class TransactionResource extends Resource
                 Forms\Components\Select::make('branch_id')
                     ->relationship('branch', 'name')
                     ->label('Cabang')
-                    ->disabled() // PERBAIKAN: Gunakan disabled() untuk Select
+                    ->disabled() 
                     ->required(),
                 Forms\Components\TextInput::make('invoice_number')
                     ->label('Nomor Invoice')
@@ -45,9 +46,9 @@ class TransactionResource extends Resource
                     ->numeric()
                     ->prefix('Rp')
                     ->readOnly(),
-                Forms\Components\Select::make('payment_method')
+                TextInput::make('payment_method')
                     ->label('Metode Pembayaran')
-                    ->disabled(), // PERBAIKAN: Gunakan disabled() untuk Select
+                    ->readOnly(), 
                 Forms\Components\Select::make('payment_status')
                     ->label('Status Pembayaran')
                     ->options([
@@ -59,7 +60,7 @@ class TransactionResource extends Resource
                         'challenge' => 'Tantangan',
                         'refunded' => 'Dikembalikan',
                     ])
-                    ->disabled() // PERBAIKAN: Gunakan disabled() untuk Select
+                    ->disabled() 
                     ->required(),
                 Forms\Components\TextInput::make('midtrans_transaction_id')
                     ->label('ID Transaksi Midtrans')
