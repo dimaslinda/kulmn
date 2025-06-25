@@ -94,6 +94,15 @@ class PaymentController extends Controller
                         throw new \Exception('Product not found');
                     }
 
+                    // Pengecekan stok sebelum transaksi
+                    $stock = Stock::where('product_id', $product->id)
+                        ->where('branch_id', $branchId)
+                        ->first();
+
+                    if (!$stock || $stock->quantity < $item['quantity']) {
+                        throw new \Exception("Stok produk {$product->name} tidak mencukupi. Stok tersedia: " . ($stock ? $stock->quantity : 0));
+                    }
+
                     TransactionDetail::create([
                         'transaction_id' => $transaction->id,
                         'product_id' => $item['id'],
@@ -101,8 +110,10 @@ class PaymentController extends Controller
                         'price' => $product->price,
                         'subtotal' => $product->price * $item['quantity']
                     ]);
-                    // Kurangi stok produk di cabang terkait
-                    Stock::where('product_id', $product->id)->where('branch_id', $branchId)->decrement('quantity', $item['quantity']);
+                    // Kurangi stok produk di cabang terkait (khusus cash)
+                    Stock::where('product_id', $product->id)
+                        ->where('branch_id', $branchId)
+                        ->decrement('quantity', $item['quantity']);
                 }
             }
 
@@ -181,6 +192,16 @@ class PaymentController extends Controller
                     if (!$item) {
                         throw new Exception("Produk dengan ID {$id} tidak ditemukan.");
                     }
+
+                    // Pengecekan stok sebelum transaksi
+                    $stock = Stock::where('product_id', $item->id)
+                        ->where('branch_id', $branchId)
+                        ->first();
+
+                    if (!$stock || $stock->quantity < $quantity) {
+                        throw new Exception("Stok produk {$item->name} tidak mencukupi. Stok tersedia: " . ($stock ? $stock->quantity : 0));
+                    }
+
                     $subtotal = $item->price * $quantity;
                     $totalAmount += $subtotal;
 
@@ -191,9 +212,6 @@ class PaymentController extends Controller
                         'subtotal' => $subtotal,
                         'type' => 'product',
                     ];
-
-                    // Kurangi stok produk di cabang terkait
-                    Stock::where('product_id', $item->id)->where('branch_id', $branchId)->decrement('quantity', $quantity);
                 }
             }
 
@@ -210,10 +228,6 @@ class PaymentController extends Controller
 
             foreach ($transactionDetails as $detail) {
                 $transaction->transactionDetails()->create($detail);
-                if ($detail['type'] === 'product') {
-                    // Kurangi stok produk di cabang terkait
-                    Stock::where('product_id', $detail['product_id'])->where('branch_id', $branchId)->decrement('quantity', $detail['quantity']);
-                }
             }
 
             $midtrans_params = [

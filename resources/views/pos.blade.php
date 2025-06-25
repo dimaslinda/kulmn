@@ -17,6 +17,8 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
         rel="stylesheet">
 
+    <!-- ToastJS CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -168,7 +170,50 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    <!-- ToastJS JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
+        // Toast notification utility functions
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: 'linear-gradient(to right, #e9c664, #f4d03f)',
+                error: 'linear-gradient(to right, #dc2626, #ef4444)',
+                warning: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+                info: 'linear-gradient(to right, #191919, #374151)'
+            };
+
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: colors[type] || colors.info,
+                stopOnFocus: true,
+                close: true,
+                style: {
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: type === 'success' ? '#191919' : '#ffffff',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                }
+            }).showToast();
+        }
+
+        // Security utility function untuk sanitasi HTML
+        function sanitizeHTML(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Security utility function untuk validasi input
+        function validateInput(input, maxLength = 255) {
+            if (typeof input !== 'string') return '';
+            return input.trim().substring(0, maxLength);
+        }
+
         let services = [];
         let products = [];
         let cart = {}; // { itemId: { quantity: X, type: 'service'|'product', name: '...', price: ... } }
@@ -234,10 +279,23 @@
 
             } catch (error) {
                 console.error('Error fetching data:', error);
-                document.getElementById('service-content').innerHTML =
-                    '<p class="text-red-500">Gagal memuat data. Silakan coba lagi nanti.</p>';
-                document.getElementById('product-content').innerHTML =
-                    '<p class="text-red-500">Gagal memuat data. Silakan coba lagi nanti.</p>';
+                // Menggunakan textContent untuk menghindari XSS
+                const serviceContent = document.getElementById('service-content');
+                const productContent = document.getElementById('product-content');
+
+                serviceContent.textContent = '';
+                const serviceError = document.createElement('p');
+                serviceError.className = 'text-red-500';
+                serviceError.textContent = 'Gagal memuat data. Silakan coba lagi nanti.';
+                serviceContent.appendChild(serviceError);
+
+                productContent.textContent = '';
+                const productError = document.createElement('p');
+                productError.className = 'text-red-500';
+                productError.textContent = 'Gagal memuat data. Silakan coba lagi nanti.';
+                productContent.appendChild(productError);
+
+                showToast('Gagal memuat data layanan dan produk', 'error');
             }
         }
 
@@ -245,10 +303,13 @@
 
         function renderItems(items, containerId, type) {
             const container = document.getElementById(containerId);
-            container.innerHTML = '';
+            container.textContent = ''; // Menggunakan textContent untuk keamanan
+
             if (items.length === 0) {
-                container.innerHTML =
-                    `<p class="text-gray-500">Belum ada ${type} yang ditambahkan. Silakan tambahkan melalui panel admin.</p>`;
+                const noItemsMsg = document.createElement('p');
+                noItemsMsg.className = 'text-gray-500';
+                noItemsMsg.textContent = `Belum ada ${type} yang ditambahkan. Silakan tambahkan melalui panel admin.`;
+                container.appendChild(noItemsMsg);
                 return;
             }
 
@@ -258,12 +319,20 @@
                     'service-item bg-white p-4 border border-gray-300 rounded-md flex justify-between items-center cursor-pointer';
                 itemCard.dataset.id = item.id;
                 itemCard.dataset.type = type; // 'service' or 'product'
-                itemCard.innerHTML = `
-                    <div>
-                        <h3 class="text-lg font-medium">${item.name}</h3>
-                    </div>
-                    <div class="font-semibold">Rp ${parseFloat(item.price).toLocaleString('id-ID')}</div>
-                `;
+
+                // Menggunakan createElement dan textContent untuk menghindari XSS
+                const itemName = document.createElement('div');
+                const itemTitle = document.createElement('h3');
+                itemTitle.className = 'text-lg font-medium';
+                itemTitle.textContent = validateInput(item.name);
+                itemName.appendChild(itemTitle);
+
+                const itemPrice = document.createElement('div');
+                itemPrice.className = 'font-semibold';
+                itemPrice.textContent = `Rp ${parseFloat(item.price).toLocaleString('id-ID')}`;
+
+                itemCard.appendChild(itemName);
+                itemCard.appendChild(itemPrice);
                 container.appendChild(itemCard);
             });
 
@@ -294,6 +363,8 @@
                     price: item.price,
                     originalId: id
                 }; // Store type, name, price, and originalId
+
+                showToast(`${validateInput(item.name)} ditambahkan ke keranjang`, 'success');
             }
             updateCartDisplay();
             updateItemStates();
@@ -303,10 +374,13 @@
             const cartSummaryItemsDiv = document.getElementById('cart-summary-items');
             const cartTotalSummarySpan = document.getElementById('cart-total-summary');
             let total = 0;
-            cartSummaryItemsDiv.innerHTML = '';
+            cartSummaryItemsDiv.textContent = ''; // Menggunakan textContent untuk keamanan
 
             if (Object.keys(cart).length === 0) {
-                cartSummaryItemsDiv.innerHTML = '<p class="text-gray-500">Keranjang kosong.</p>';
+                const emptyMsg = document.createElement('p');
+                emptyMsg.className = 'text-gray-500';
+                emptyMsg.textContent = 'Keranjang kosong.';
+                cartSummaryItemsDiv.appendChild(emptyMsg);
                 cartTotalSummarySpan.textContent = 'Rp 0';
                 updateItemStates();
                 return;
@@ -320,15 +394,40 @@
 
                 const cartItemDiv = document.createElement('div');
                 cartItemDiv.className = 'flex justify-between items-center';
-                cartItemDiv.innerHTML = `
-                    <span class="text-gray-700">${itemInCart.name}</span>
-                    <div class="flex items-center space-x-2">
-                        <span class="font-semibold">Rp ${parseFloat(itemTotal).toLocaleString('id-ID')}</span>
-                        <button class="quantity-control-btn decrease-quantity cursor-pointer" data-id="${uniqueId}">-</button>
-                        <span class="quantity-display">${quantity}</span>
-                        <button class="quantity-control-btn increase-quantity cursor-pointer" data-id="${uniqueId}">+</button>
-                    </div>
-                `;
+
+                // Menggunakan createElement dan textContent untuk menghindari XSS
+                const itemName = document.createElement('span');
+                itemName.className = 'text-gray-700';
+                itemName.textContent = validateInput(itemInCart.name);
+
+                const itemControls = document.createElement('div');
+                itemControls.className = 'flex items-center space-x-2';
+
+                const itemPrice = document.createElement('span');
+                itemPrice.className = 'font-semibold';
+                itemPrice.textContent = `Rp ${parseFloat(itemTotal).toLocaleString('id-ID')}`;
+
+                const decreaseBtn = document.createElement('button');
+                decreaseBtn.className = 'quantity-control-btn decrease-quantity cursor-pointer';
+                decreaseBtn.dataset.id = uniqueId;
+                decreaseBtn.textContent = '-';
+
+                const quantitySpan = document.createElement('span');
+                quantitySpan.className = 'quantity-display';
+                quantitySpan.textContent = quantity;
+
+                const increaseBtn = document.createElement('button');
+                increaseBtn.className = 'quantity-control-btn increase-quantity cursor-pointer';
+                increaseBtn.dataset.id = uniqueId;
+                increaseBtn.textContent = '+';
+
+                itemControls.appendChild(itemPrice);
+                itemControls.appendChild(decreaseBtn);
+                itemControls.appendChild(quantitySpan);
+                itemControls.appendChild(increaseBtn);
+
+                cartItemDiv.appendChild(itemName);
+                cartItemDiv.appendChild(itemControls);
                 cartSummaryItemsDiv.appendChild(cartItemDiv);
             }
             cartTotalSummarySpan.textContent = `Rp ${parseFloat(total).toLocaleString('id-ID')}`;
@@ -339,6 +438,7 @@
                     cart[uniqueId].quantity++;
                     updateCartDisplay();
                     updateItemStates();
+                    showToast(`Jumlah ${validateInput(cart[uniqueId].name)} ditambah`, 'info');
                 });
             });
 
@@ -347,8 +447,11 @@
                     const uniqueId = e.target.dataset.id;
                     if (cart[uniqueId].quantity > 1) {
                         cart[uniqueId].quantity--;
+                        showToast(`Jumlah ${validateInput(cart[uniqueId].name)} dikurangi`, 'info');
                     } else {
+                        const itemName = validateInput(cart[uniqueId].name);
                         delete cart[uniqueId];
+                        showToast(`${itemName} dihapus dari keranjang`, 'warning');
                     }
                     updateCartDisplay();
                     updateItemStates();
@@ -386,7 +489,7 @@
                     paymentResultDiv.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
                     document.getElementById('qr-code-display').style.display = 'none';
                     clearInterval(paymentPollingInterval);
-                    alert('Pembayaran Berhasil!');
+                    showToast('Pembayaran Berhasil!', 'success');
                 } else if (data.status === 'expire' || data.status === 'failed' || data.status === 'cancelled') {
                     document.getElementById('result-status').textContent = `Status: ${data.payment_status}`;
                     const paymentResultDiv = document.getElementById('payment-result');
@@ -395,7 +498,7 @@
                     paymentResultDiv.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
                     document.getElementById('qr-code-display').style.display = 'none';
                     clearInterval(paymentPollingInterval);
-                    alert('Pembayaran Gagal atau Kadaluarsa!');
+                    showToast('Pembayaran Gagal atau Kadaluarsa!', 'error');
                 } else {
                     document.getElementById('result-status').textContent = `Status: ${data.payment_status}`;
                 }
@@ -448,12 +551,12 @@
             const amountPaid = parseFloat(amountPaidInput.value);
 
             if (Object.keys(cart).length === 0) {
-                alert('Keranjang belanja kosong. Silakan tambahkan layanan terlebih dahulu.');
+                showToast('Keranjang belanja kosong. Silakan tambahkan layanan terlebih dahulu.', 'warning');
                 return;
             }
 
             if (isNaN(amountPaid) || amountPaid < totalAmount) {
-                alert('Jumlah pembayaran tunai tidak mencukupi atau tidak valid.');
+                showToast('Jumlah pembayaran tunai tidak mencukupi atau tidak valid.', 'error');
                 return;
             }
 
@@ -468,7 +571,8 @@
             }
 
             if (!selectedBranchId || selectedBranchId === 'null' || selectedBranchCode === 'UNASSIGNED') {
-                alert('Tidak dapat membuat transaksi: Akun Anda tidak terhubung ke cabang yang valid.');
+                showToast('Tidak dapat membuat transaksi: Akun Anda tidak terhubung ke cabang yang valid.',
+                    'error');
                 return;
             }
 
@@ -513,6 +617,8 @@
                     amountPaidInput.value = '';
                     document.getElementById('change-amount').value = '';
 
+                    showToast('Transaksi tunai berhasil diproses!', 'success');
+
                 } else {
                     document.getElementById('result-message').textContent =
                         `Gagal membuat transaksi tunai: ${result.message || 'Terjadi kesalahan'}`;
@@ -520,6 +626,9 @@
                     paymentResultDiv.classList.remove('hidden', 'bg-green-100', 'border-green-400',
                         'text-green-700');
                     paymentResultDiv.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+
+                    showToast(`Gagal membuat transaksi tunai: ${result.message || 'Terjadi kesalahan'}`,
+                        'error');
                 }
                 paymentResultDiv.classList.remove('hidden');
 
@@ -532,6 +641,8 @@
                 paymentResultDiv.classList.remove('hidden', 'bg-green-100', 'border-green-400',
                     'text-green-700');
                 paymentResultDiv.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+
+                showToast(`Terjadi kesalahan jaringan: ${error.message}`, 'error');
             } finally {
                 document.getElementById('process-cash-payment').disabled = false;
                 document.getElementById('process-cash-payment').textContent = 'PROSES PEMBAYARAN TUNAI';
@@ -552,7 +663,7 @@
             }
 
             if (itemsToSend.length === 0) {
-                alert('Keranjang belanja kosong. Silakan tambahkan layanan terlebih dahulu.');
+                showToast('Keranjang belanja kosong. Silakan tambahkan layanan terlebih dahulu.', 'warning');
                 return;
             }
 
@@ -560,7 +671,8 @@
             // selectedBranchId bisa berupa string kosong jika 'null' dari Blade.
             // selectedBranchCode bisa 'UNASSIGNED'.
             if (!selectedBranchId || selectedBranchId === 'null' || selectedBranchCode === 'UNASSIGNED') {
-                alert('Tidak dapat membuat transaksi: Akun Anda tidak terhubung ke cabang yang valid.');
+                showToast('Tidak dapat membuat transaksi: Akun Anda tidak terhubung ke cabang yang valid.',
+                    'error');
                 document.getElementById('qris-pay-button').disabled = false; // Aktifkan kembali tombol
                 document.getElementById('qris-pay-button').textContent = 'LANJUTKAN';
                 return; // Hentikan eksekusi jika validasi gagal
@@ -613,6 +725,9 @@
 
                     paymentPollingInterval = setInterval(checkPaymentStatus, 5000);
 
+                    showToast('Transaksi QRIS berhasil dibuat! Silakan scan QR code untuk pembayaran.',
+                        'success');
+
                 } else {
                     document.getElementById('result-message').textContent =
                         `Gagal membuat transaksi: ${result.message || 'Terjadi kesalahan'}`;
@@ -620,6 +735,8 @@
                     paymentResultDiv.classList.remove('hidden', 'bg-green-100', 'border-green-400',
                         'text-green-700');
                     paymentResultDiv.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+
+                    showToast(`Gagal membuat transaksi: ${result.message || 'Terjadi kesalahan'}`, 'error');
                 }
                 paymentResultDiv.classList.remove('hidden');
 
@@ -632,6 +749,8 @@
                 paymentResultDiv.classList.remove('hidden', 'bg-green-100', 'border-green-400',
                     'text-green-700');
                 paymentResultDiv.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+
+                showToast(`Terjadi kesalahan jaringan: ${error.message}`, 'error');
             } finally {
                 document.getElementById('qris-pay-button').disabled = false;
                 document.getElementById('qris-pay-button').textContent = 'LANJUTKAN';

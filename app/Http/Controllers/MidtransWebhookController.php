@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use App\Models\Stock; // Tambahkan ini jika menggunakan stok
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Midtrans\Config;
 use Midtrans\Notification;
 use Exception;
@@ -31,7 +32,7 @@ class MidtransWebhookController extends Controller
             $transaction = Transaction::where('midtrans_order_id', $orderId)->first();
 
             if (!$transaction) {
-                \Log::warning('Midtrans Notification: Transaction not found for order ID: ' . $orderId);
+                Log::warning('Midtrans Notification: Transaction not found for order ID: ' . $orderId);
                 return response()->json(['message' => 'Transaction not found'], 404);
             }
 
@@ -42,25 +43,25 @@ class MidtransWebhookController extends Controller
                     $transaction->payment_status = 'success';
                     // --- PENTING: Logika pengurangan stok di sini setelah pembayaran sukses ---
                     // Contoh:
-                    // foreach ($transaction->transactionDetails as $detail) {
-                    //     if ($detail->type === 'product' && $detail->product_id) {
-                    //         Stock::where('product_id', $detail->product_id)
-                    //              ->where('branch_id', $transaction->branch_id)
-                    //              ->decrement('quantity', $detail->quantity);
-                    //     }
-                    // }
+                    foreach ($transaction->transactionDetails as $detail) {
+                        if ($detail->type === 'product' && $detail->product_id) {
+                            Stock::where('product_id', $detail->product_id)
+                                ->where('branch_id', $transaction->branch_id)
+                                ->decrement('quantity', $detail->quantity);
+                        }
+                    }
                 }
             } else if ($transactionStatus == 'settlement') {
                 $transaction->payment_status = 'success';
                 // --- PENTING: Logika pengurangan stok di sini setelah pembayaran sukses (jika tidak di capture) ---
                 // Pastikan tidak dobel dengan capture
-                // foreach ($transaction->transactionDetails as $detail) {
-                //     if ($detail->type === 'product' && $detail->product_id) {
-                //         Stock::where('product_id', $detail->product_id)
-                //              ->where('branch_id', $transaction->branch_id)
-                //              ->decrement('quantity', $detail->quantity);
-                //     }
-                // }
+                foreach ($transaction->transactionDetails as $detail) {
+                    if ($detail->type === 'product' && $detail->product_id) {
+                        Stock::where('product_id', $detail->product_id)
+                            ->where('branch_id', $transaction->branch_id)
+                            ->decrement('quantity', $detail->quantity);
+                    }
+                }
             } else if ($transactionStatus == 'pending') {
                 $transaction->payment_status = 'pending';
             } else if ($transactionStatus == 'deny') {
@@ -75,12 +76,11 @@ class MidtransWebhookController extends Controller
 
             $transaction->save();
 
-            \Log::info('Midtrans Notification Processed for Order ID: ' . $orderId . ' Status: ' . $transaction->payment_status);
+            Log::info('Midtrans Notification Processed for Order ID: ' . $orderId . ' Status: ' . $transaction->payment_status);
 
             return response()->json(['message' => 'OK'], 200);
-
         } catch (Exception $e) {
-            \Log::error('Midtrans Webhook Error: ' . $e->getMessage());
+            Log::error('Midtrans Webhook Error: ' . $e->getMessage());
             return response()->json(['message' => 'Error processing webhook: ' . $e->getMessage()], 500);
         }
     }
