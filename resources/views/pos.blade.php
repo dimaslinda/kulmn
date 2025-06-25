@@ -169,6 +169,44 @@
         </div>
     </div>
 
+    <!-- Modal Konfirmasi Pembayaran Tunai -->
+    <div id="cash-confirm-modal" tabindex="-1"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative bg-hitam rounded-lg shadow-sm">
+                <button type="button"
+                    class="absolute top-3 end-2.5 text-white bg-transparent cursor-pointer text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+                    data-modal-hide="cash-confirm-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+                <div class="p-4 md:p-5 text-center">
+                    <svg class="mx-auto mb-4 text-yellow-500 w-12 h-12" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <h3 class="mb-2 text-lg font-semibold text-white">Konfirmasi Pembayaran Tunai</h3>
+                    <p id="cash-confirm-text" class="mb-5 text-base text-white"></p>
+                    <div class="flex justify-center">
+                        <button id="confirm-cash-pay-btn" type="button"
+                            class="bg-green-500 hover:bg-green-400 text-white cursor-pointer font-bold py-2.5 px-5 ms-3 rounded">
+                            Ya, proses
+                        </button>
+                        <button data-modal-hide="cash-confirm-modal" type="button"
+                            class="py-2.5 px-5 ms-3 text-sm font-medium text-white focus:outline-none cursor-pointer bg-tombol rounded hover:bg-tombol/80">
+                            Batal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
     <!-- ToastJS JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -544,7 +582,8 @@
             }
         });
 
-        document.getElementById('process-cash-payment').addEventListener('click', async () => {
+        document.getElementById('process-cash-payment').addEventListener('click', async (e) => {
+            e.preventDefault();
             const amountPaidInput = document.getElementById('amount-paid');
             const totalAmount = parseFloat(document.getElementById('cart-total-summary').textContent.replace(
                 'Rp ', '').replace(/\./g, '').replace(/,/g, '.'));
@@ -559,6 +598,27 @@
                 showToast('Jumlah pembayaran tunai tidak mencukupi atau tidak valid.', 'error');
                 return;
             }
+
+            // Tampilkan modal konfirmasi
+            const modal = document.getElementById('cash-confirm-modal');
+            const modalText = document.getElementById('cash-confirm-text');
+            modalText.textContent =
+                `Jumlah dibayar: Rp ${amountPaid.toLocaleString('id-ID')}\nTotal belanja: Rp ${totalAmount.toLocaleString('id-ID')}\n\nApakah Anda yakin ingin memproses pembayaran tunai?`;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // Simpan data sementara untuk proses
+            window._cashPayTemp = {
+                amountPaid,
+                totalAmount
+            };
+        });
+
+        // Proses jika user klik "Ya, proses" di modal
+        document.getElementById('confirm-cash-pay-btn').addEventListener('click', async () => {
+            const amountPaid = window._cashPayTemp.amountPaid;
+            const totalAmount = window._cashPayTemp.totalAmount;
+            const amountPaidInput = document.getElementById('amount-paid');
 
             const itemsToSend = [];
             for (const itemId in cart) {
@@ -646,7 +706,19 @@
             } finally {
                 document.getElementById('process-cash-payment').disabled = false;
                 document.getElementById('process-cash-payment').textContent = 'PROSES PEMBAYARAN TUNAI';
+                // Tutup modal
+                document.getElementById('cash-confirm-modal').classList.add('hidden');
+                document.getElementById('cash-confirm-modal').classList.remove('flex');
             }
+        });
+
+        // Tutup modal jika klik tombol batal atau close
+        document.querySelectorAll('[data-modal-hide="cash-confirm-modal"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('cash-confirm-modal').classList.add('hidden');
+                document.getElementById('cash-confirm-modal').classList.remove('flex');
+                showToast('Pembayaran tunai dibatalkan.', 'info');
+            });
         });
 
         // Original QRIS payment button listener (renamed from pay-button to qris-pay-button)
