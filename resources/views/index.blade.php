@@ -184,7 +184,7 @@
                             BE A <br> PROFESIONAL <br> CAPSTER
                         </div>
                         <div class="font-poppins text-hitam text-base md:text-lg font-light mb-8">
-                            Tim scara terdiri dari capster terlatih melalui seleksi dan pelatihan ketat, mulai dari
+                            Tim terdiri dari capster terlatih melalui seleksi dan pelatihan ketat, mulai dari
                             teori terkini hingga layanan pelanggan yang profesional. Ingin jadi capster profesional?
                             Daftar sekarang di Academy Capster kami!
                         </div>
