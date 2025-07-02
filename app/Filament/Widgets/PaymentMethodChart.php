@@ -19,7 +19,7 @@ class PaymentMethodChart extends ChartWidget
     // Metode untuk menentukan jenis chart
     protected function getType(): string
     {
-        return 'doughnut'; // Menggunakan Donut Chart (seperti Pie Chart dengan lubang di tengah)
+        return 'bar'; // Mengubah menjadi Bar Chart
     }
 
     // Metode untuk mengambil data chart
@@ -91,25 +91,33 @@ class PaymentMethodChart extends ChartWidget
             'responsive' => true,
             'plugins' => [
                 'legend' => [
-                    'position' => 'bottom', // Legenda di bawah chart
+                    'display' => false, // Untuk bar chart, biasanya legend tidak diperlukan
                 ],
                 'tooltip' => [
                     'enabled' => true,
                     'callbacks' => [
-                        // Menampilkan persentase di tooltip
+                        // Menampilkan jumlah di tooltip
                         'label' => 'function(context) {
-                            let sum = 0;
-                            let dataArr = context.dataset.data;
-                            dataArr.map(data => {
-                                sum += data;
-                            });
-                            let percentage = (context.parsed / sum * 100).toFixed(1) + "%";
-                            return context.label + ": " + context.parsed + " (" + percentage + ")";
+                            return context.label + ": " + context.parsed.y;
                         }'
                     ]
                 ],
             ],
-            'cutout' => '70%', // Mengatur ukuran lubang di tengah (untuk donut chart)
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                    'title' => [
+                        'display' => true,
+                        'text' => 'Jumlah Transaksi',
+                    ],
+                ],
+                'x' => [
+                    'title' => [
+                        'display' => true,
+                        'text' => 'Metode Pembayaran',
+                    ],
+                ],
+            ],
         ];
     }
 
