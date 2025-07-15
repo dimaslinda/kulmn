@@ -1,0 +1,12 @@
+flowchart TD
+  A[User Login] --> B[Pilih Layanan/Produk]
+  B --> C[Tambah ke Keranjang]
+  C --> D{Pilih Metode Pembayaran}
+  D -- QRIS --> E[Proses QRIS]
+  D -- Tunai --> F[Input Jumlah Tunai]
+  E --> G[Scan QR Code]
+  G --> H{Pembayaran Sukses?}
+  H -- Ya --> I[Tampilkan Invoice & Status]
+  H -- Tidak --> J[Tampilkan Error]
+  F --> K[Konfirmasi & Proses Tunai]
+  K --> L[Tampilkan Invoice & Status]

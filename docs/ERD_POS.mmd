@@ -1,0 +1,54 @@
+erDiagram
+  USER ||--o{ TRANSACTION : "melakukan"
+  BRANCH ||--o{ TRANSACTION : "memiliki"
+  TRANSACTION ||--|{ TRANSACTION_DETAIL : "memiliki"
+  SERVICE ||--o{ TRANSACTION_DETAIL : "bisa diorder"
+  PRODUCT ||--o{ TRANSACTION_DETAIL : "bisa diorder"
+  BRANCH ||--o{ STOCK : "memiliki stok"
+  PRODUCT ||--o{ STOCK : "memiliki stok"
+
+  USER {
+    int id
+    string name
+    string email
+  }
+  BRANCH {
+    int id
+    string code
+    string name
+  }
+  TRANSACTION {
+    int id
+    int user_id
+    int branch_id
+    string invoice_number
+    decimal total_amount
+    decimal amount_paid
+    string payment_method
+    string payment_status
+  }
+  TRANSACTION_DETAIL {
+    int id
+    int transaction_id
+    int service_id
+    int product_id
+    int quantity
+    decimal price
+    decimal subtotal
+  }
+  SERVICE {
+    int id
+    string name
+    decimal price
+  }
+  PRODUCT {
+    int id
+    string name
+    decimal price
+  }
+  STOCK {
+    int id
+    int product_id
+    int branch_id
+    int quantity
+  }
