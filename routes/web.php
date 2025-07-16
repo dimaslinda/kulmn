@@ -21,22 +21,22 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard');
 
     // Rute utama aplikasi POS
-    Route::get('/pos', function () {
-        $user = Auth::user();
+    // Route::get('/pos', function () {
+    //     $user = Auth::user();
 
-        // --- PERBAIKAN: Seluruh blok validasi `if (!$user->branch)` DIHAPUS DARI SINI ---
-        // Dengan ini, semua user yang login akan bisa mengakses halaman POS.
-        // Penanganan user tanpa cabang (misal admin pusat atau user yang tidak terhubung)
-        // akan dilakukan di view pos.blade.php dan di PaymentController untuk aksi pembuatan transaksi.
+    //     // --- PERBAIKAN: Seluruh blok validasi `if (!$user->branch)` DIHAPUS DARI SINI ---
+    //     // Dengan ini, semua user yang login akan bisa mengakses halaman POS.
+    //     // Penanganan user tanpa cabang (misal admin pusat atau user yang tidak terhubung)
+    //     // akan dilakukan di view pos.blade.php dan di PaymentController untuk aksi pembuatan transaksi.
 
-        return view('pos', [
-            // selectedBranchId dan selectedBranchCode akan null jika $user->branch null
-            'selectedBranchId' => $user->branch ? $user->branch->id : null,
-            'selectedBranchCode' => $user->branch ? $user->branch->code : 'UNASSIGNED', // Placeholder jika tidak ada cabang
-        ]);
-    })->name('pos.home');
+    //     return view('pos', [
+    //         // selectedBranchId dan selectedBranchCode akan null jika $user->branch null
+    //         'selectedBranchId' => $user->branch ? $user->branch->id : null,
+    //         'selectedBranchCode' => $user->branch ? $user->branch->code : 'UNASSIGNED', // Placeholder jika tidak ada cabang
+    //     ]);
+    // })->name('pos.home');
 
-    Route::post('/api/create-cash-transaction', [PaymentController::class, 'createCashTransaction']);
+    // Route::post('/api/create-cash-transaction', [PaymentController::class, 'createCashTransaction']);
 });
 
 // --- Rute Callback Midtrans (Tidak Membutuhkan Autentikasi) ---
