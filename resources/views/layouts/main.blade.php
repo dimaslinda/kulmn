@@ -24,7 +24,7 @@
     <meta property="twitter:description" content="@yield('description', 'Kulmn Barbershop - Be Cool, Be a Man, with Kulmn. Temukan gayamu di Kulmn.')">
     <meta property="twitter:image" content="@yield('og:image', asset('img/general/og-image.webp'))">
 
-    <script type="application/ld+json">
+    {{-- <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
@@ -33,7 +33,7 @@
       "logo": "{{ asset('img/general/logo.webp') }}",
       "description": "Kulmn Barbershop - Be Cool, Be a Man, with Kulmn. Temukan gayamu di Kulmn."
     }
-    </script>
+    </script> --}}
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

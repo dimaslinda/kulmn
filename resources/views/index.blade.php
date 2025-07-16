@@ -11,7 +11,7 @@
 
 @section('kepala')
 
-    <script type="application/ld+json">
+    {{-- <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebPage",
@@ -27,7 +27,7 @@
         }
       }
     }
-    </script>
+    </script> --}}
     <!-- SwiperJS CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 @endsection
