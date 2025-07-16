@@ -24,10 +24,10 @@ Route::middleware(['auth'])->group(function () {
     // Route::get('/pos', function () {
     //     $user = Auth::user();
 
-    //     // --- PERBAIKAN: Seluruh blok validasi `if (!$user->branch)` DIHAPUS DARI SINI ---
-    //     // Dengan ini, semua user yang login akan bisa mengakses halaman POS.
-    //     // Penanganan user tanpa cabang (misal admin pusat atau user yang tidak terhubung)
-    //     // akan dilakukan di view pos.blade.php dan di PaymentController untuk aksi pembuatan transaksi.
+    // --- PERBAIKAN: Seluruh blok validasi `if (!$user->branch)` DIHAPUS DARI SINI ---
+    // Dengan ini, semua user yang login akan bisa mengakses halaman POS.
+    // Penanganan user tanpa cabang (misal admin pusat atau user yang tidak terhubung)
+    // akan dilakukan di view pos.blade.php dan di PaymentController untuk aksi pembuatan transaksi.
 
     //     return view('pos', [
     //         // selectedBranchId dan selectedBranchCode akan null jika $user->branch null
